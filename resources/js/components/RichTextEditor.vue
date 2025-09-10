@@ -7,125 +7,325 @@ import Link from '@tiptap/extension-link'
 import Image from '@tiptap/extension-image'
 
 type Props = {
-    modelValue?: string,        // v-model (HTML)
-    placeholder?: string,
+    modelValue?: string
+    placeholder?: string
     editable?: boolean
+    minHeight?: string
 }
 const props = withDefaults(defineProps<Props>(), {
     modelValue: '',
     placeholder: 'Write something…',
     editable: true,
+    minHeight: '12rem',
 })
-const emit = defineEmits<{
-    (e: 'update:modelValue', value: string): void
-}>()
+const emit = defineEmits<{ (e: 'update:modelValue', v: string): void }>()
 
-// keep editor in sync with v-model
 const editor = useEditor({
     content: props.modelValue,
     editable: props.editable,
     extensions: [
-        StarterKit.configure({
-            heading: { levels: [1,2,3,4] },
-        }),
-        Placeholder.configure({
-            placeholder: props.placeholder,
-        }),
+        StarterKit.configure({ heading: { levels: [1, 2, 3, 4] } }),
+        Placeholder.configure({ placeholder: props.placeholder }),
         Link.configure({
-            openOnClick: true,
+            /* avoid navigating away when clicking links in the editor */
+            openOnClick: false,
             autolink: true,
             linkOnPaste: true,
             protocols: ['http', 'https', 'mailto', 'tel'],
         }),
         Image,
     ],
-    onUpdate: ({ editor }) => {
-        emit('update:modelValue', editor.getHTML())
-    },
+    onUpdate: ({ editor }) => emit('update:modelValue', editor.getHTML()),
 })
 
 watch(() => props.modelValue, (val) => {
-    if (!editor) return
-    // avoid infinite loop – only set if content actually changed
-    const current = editor.getHTML()
-    if (val !== current) editor.commands.setContent(val ?? '', false)
+    const ed = editor.value; if (!ed) return
+    const current = ed.getHTML()
+    if (val !== current) ed.commands.setContent(val ?? '', false)
 })
+watch(() => props.editable, (val) => editor.value?.setEditable(!!val))
+onBeforeUnmount(() => editor.value?.destroy())
 
-watch(() => props.editable, (val) => {
-    editor?.setEditable(!!val)
-})
-
-onBeforeUnmount(() => editor?.destroy())
-
-const canUndo = computed(() => editor?.can().chain().focus().undo().run())
-const canRedo = computed(() => editor?.can().chain().focus().redo().run())
+const canUndo = computed(() => !!editor.value?.can().chain().focus().undo().run())
+const canRedo = computed(() => !!editor.value?.can().chain().focus().redo().run())
 
 function promptForLink() {
-    const previous = editor?.getAttributes('link').href as string | undefined
+    const ed = editor.value; if (!ed) return
+    const previous = ed.getAttributes('link').href as string | undefined
     const url = window.prompt('URL', previous ?? 'https://')
     if (url === null) return
-    if (url === '') {
-        editor?.chain().focus().unsetLink().run()
-        return
-    }
-    editor?.chain().focus().setLink({ href: url }).run()
+    if (url === '') { ed.chain().focus().unsetLink().run(); return }
+    ed.chain().focus().setLink({ href: url }).run()
 }
-
 function addImage() {
+    const ed = editor.value; if (!ed) return
     const url = window.prompt('Image URL', 'https://')
     if (!url) return
-    editor?.chain().focus().setImage({ src: url }).run()
+    ed.chain().focus().setImage({ src: url }).run()
 }
 </script>
 
 <template>
-    <div class="rounded-xl border bg-white shadow-sm">
-        <!-- Toolbar -->
-        <div class="flex flex-wrap gap-1 border-b p-2">
-            <button class="btn" :class="{ 'is-active': editor?.isActive('bold') }"
-                    @click="editor?.chain().focus().toggleBold().run()">B</button>
-            <button class="btn" :class="{ 'is-active': editor?.isActive('italic') }"
-                    @click="editor?.chain().focus().toggleItalic().run()">I</button>
-            <button class="btn" :class="{ 'is-active': editor?.isActive('strike') }"
-                    @click="editor?.chain().focus().toggleStrike().run()">S</button>
+    <div class="rte-card">
+        <!-- Toolbar (buttons must NOT submit the form; keep focus on editor) -->
+        <div class="rte-toolbar">
+            <button type="button" @mousedown.prevent class="rte-btn"
+                    :class="{ 'is-active': editor?.isActive('bold') }"
+                    @click="editor?.chain().focus().toggleBold().run()">
+                <span class="font-bold">B</span>
+            </button>
+            <button type="button" @mousedown.prevent class="rte-btn"
+                    :class="{ 'is-active': editor?.isActive('italic') }"
+                    @click="editor?.chain().focus().toggleItalic().run()">
+                <span class="italic">I</span>
+            </button>
+            <button type="button" @mousedown.prevent class="rte-btn"
+                    :class="{ 'is-active': editor?.isActive('strike') }"
+                    @click="editor?.chain().focus().toggleStrike().run()">
+                <span class="line-through">S</span>
+            </button>
 
-            <span class="w-px bg-zinc-200 mx-1"></span>
+            <span class="rte-divider"></span>
 
-            <button class="btn" :class="{ 'is-active': editor?.isActive('heading', { level: 2 }) }"
+            <button type="button" @mousedown.prevent class="rte-btn"
+                    :class="{ 'is-active': editor?.isActive('heading', { level: 2 }) }"
                     @click="editor?.chain().focus().toggleHeading({ level: 2 }).run()">H2</button>
-            <button class="btn" :class="{ 'is-active': editor?.isActive('heading', { level: 3 }) }"
+            <button type="button" @mousedown.prevent class="rte-btn"
+                    :class="{ 'is-active': editor?.isActive('heading', { level: 3 }) }"
                     @click="editor?.chain().focus().toggleHeading({ level: 3 }).run()">H3</button>
-            <button class="btn" @click="editor?.chain().focus().toggleBulletList().run()">• List</button>
-            <button class="btn" @click="editor?.chain().focus().toggleOrderedList().run()">1. List</button>
-            <button class="btn" @click="editor?.chain().focus().toggleBlockquote().run()">❝ Quote</button>
-            <button class="btn" @click="editor?.chain().focus().setHorizontalRule().run()">— HR</button>
-            <button class="btn" @click="editor?.chain().focus().setHardBreak().run()">↵ BR</button>
+            <button type="button" @mousedown.prevent class="rte-btn"
+                    :class="{ 'is-active': editor?.isActive('bulletList') }"
+                    @click="editor?.chain().focus().toggleBulletList().run()">• List</button>
+            <button type="button" @mousedown.prevent class="rte-btn"
+                    :class="{ 'is-active': editor?.isActive('orderedList') }"
+                    @click="editor?.chain().focus().toggleOrderedList().run()">1. List</button>
+            <button type="button" @mousedown.prevent class="rte-btn"
+                    :class="{ 'is-active': editor?.isActive('blockquote') }"
+                    @click="editor?.chain().focus().toggleBlockquote().run()">❝ Quote</button>
+            <button type="button" @mousedown.prevent class="rte-btn"
+                    @click="editor?.chain().focus().setHorizontalRule().run()">— HR</button>
+            <button type="button" @mousedown.prevent class="rte-btn"
+                    @click="editor?.chain().focus().setHardBreak().run()">↵ BR</button>
 
-            <span class="w-px bg-zinc-200 mx-1"></span>
+            <span class="rte-divider"></span>
 
-            <button class="btn" @click="promptForLink()">Link</button>
-            <button class="btn" @click="addImage()">Image</button>
+            <button type="button" @mousedown.prevent class="rte-btn"
+                    :class="{ 'is-active': editor?.isActive('link') }"
+                    @click="promptForLink()">Link</button>
+            <button type="button" @mousedown.prevent class="rte-btn"
+                    @click="addImage()">Image</button>
 
-            <span class="w-px bg-zinc-200 mx-1"></span>
+            <span class="rte-divider"></span>
 
-            <button class="btn" :disabled="!canUndo" @click="editor?.chain().focus().undo().run()">Undo</button>
-            <button class="btn" :disabled="!canRedo" @click="editor?.chain().focus().redo().run()">Redo</button>
+            <button type="button" @mousedown.prevent class="rte-btn"
+                    :disabled="!canUndo" @click="editor?.chain().focus().undo().run()">Undo</button>
+            <button type="button" @mousedown.prevent class="rte-btn"
+                    :disabled="!canRedo" @click="editor?.chain().focus().redo().run()">Redo</button>
         </div>
 
-        <!-- Editor -->
-        <div class="prose max-w-none prose-zinc p-3 min-h-[12rem]">
-            <EditorContent :editor="editor" />
+        <!-- Whole area clickable/writable -->
+        <div class="rte-surface" :style="{ minHeight: props.minHeight }"
+             @click="editor?.chain().focus().run()">
+            <EditorContent :editor="editor" class="outline-none" />
         </div>
     </div>
 </template>
 
 <style scoped>
-/* Tiptap default cursor/selection look is fine; Tailwind Typography styles content */
-.prose :deep(p.is-editor-empty:first-child::before) {
-    color: #9ca3af; /* gray-400 */
+.rte-card {
+    @apply border border-gray-300 rounded-lg overflow-hidden bg-white dark:border-gray-700 dark:bg-gray-900;
+}
+
+.rte-toolbar {
+    @apply flex flex-wrap items-center gap-1 p-2 bg-gray-50 border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700;
+}
+
+.rte-btn {
+    @apply px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed dark:text-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:hover:bg-gray-600 dark:hover:text-gray-100;
+}
+
+.rte-btn.is-active {
+    @apply bg-indigo-100 text-indigo-700 border-indigo-300 dark:bg-indigo-900 dark:text-indigo-300 dark:border-indigo-700;
+}
+
+.rte-divider {
+    @apply w-px h-6 bg-gray-300 dark:bg-gray-600;
+}
+
+.rte-surface {
+    @apply p-4 cursor-text;
+}
+</style>
+
+<style>
+/* Global styles for TipTap editor content */
+.ProseMirror {
+    outline: none;
+    color: rgb(17 24 39);
+}
+
+.dark .ProseMirror {
+    color: rgb(243 244 246);
+}
+
+.ProseMirror h1 {
+    font-size: 1.875rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.ProseMirror h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    line-height: 1.3;
+    margin-top: 1.25rem;
+    margin-bottom: 0.5rem;
+}
+
+.ProseMirror h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: 1.4;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.ProseMirror h4 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    line-height: 1.4;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.ProseMirror p {
+    margin-bottom: 0.75rem;
+    line-height: 1.6;
+}
+
+.ProseMirror ul,
+.ProseMirror ol {
+    padding-left: 1.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.ProseMirror ul {
+    list-style-type: disc;
+}
+
+.ProseMirror ol {
+    list-style-type: decimal;
+}
+
+.ProseMirror li {
+    margin-bottom: 0.25rem;
+    line-height: 1.5;
+}
+
+.ProseMirror blockquote {
+    border-left: 4px solid rgb(209 213 219);
+    padding-left: 1rem;
+    margin: 1rem 0;
+    font-style: italic;
+    color: rgb(107 114 128);
+}
+
+.dark .ProseMirror blockquote {
+    border-left-color: rgb(75 85 99);
+    color: rgb(156 163 175);
+}
+
+.ProseMirror hr {
+    border: none;
+    border-top: 2px solid rgb(229 231 235);
+    margin: 1.5rem 0;
+}
+
+.dark .ProseMirror hr {
+    border-top-color: rgb(75 85 99);
+}
+
+.ProseMirror a {
+    color: rgb(59 130 246);
+    text-decoration: underline;
+}
+
+.dark .ProseMirror a {
+    color: rgb(96 165 250);
+}
+
+.ProseMirror a:hover {
+    color: rgb(37 99 235);
+}
+
+.dark .ProseMirror a:hover {
+    color: rgb(59 130 246);
+}
+
+.ProseMirror img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.375rem;
+    margin: 0.5rem 0;
+}
+
+.ProseMirror code {
+    background-color: rgb(243 244 246);
+    color: rgb(220 38 127);
+    padding: 0.125rem 0.25rem;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+.dark .ProseMirror code {
+    background-color: rgb(55 65 81);
+    color: rgb(251 113 133);
+}
+
+.ProseMirror pre {
+    background-color: rgb(17 24 39);
+    color: rgb(229 231 235);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    overflow-x: auto;
+    margin: 1rem 0;
+}
+
+.ProseMirror pre code {
+    background: none;
+    color: inherit;
+    padding: 0;
+    border-radius: 0;
+    font-size: 0.875rem;
+}
+
+/* Placeholder styling */
+.ProseMirror p.is-editor-empty:first-child::before {
     content: attr(data-placeholder);
     float: left;
-    height: 0;
+    color: rgb(156 163 175);
     pointer-events: none;
+    height: 0;
+}
+
+.dark .ProseMirror p.is-editor-empty:first-child::before {
+    color: rgb(107 114 128);
+}
+
+/* Focus styles */
+.ProseMirror:focus {
+    outline: none;
+}
+
+/* Selection styles */
+.ProseMirror ::selection {
+    background-color: rgb(219 234 254);
+}
+
+.dark .ProseMirror ::selection {
+    background-color: rgb(30 58 138);
 }
 </style>

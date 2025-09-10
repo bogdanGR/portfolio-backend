@@ -1,9 +1,48 @@
 @import 'tailwindcss';
 
 @import 'tw-animate-css';
-
+@plugin "@tailwindcss/typography";
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
+
+@layer components {
+    .rte-card {
+        @apply rounded-xl border shadow-sm bg-white dark:bg-zinc-900 dark:border-zinc-800;
+    }
+    .rte-toolbar {
+        @apply flex flex-wrap gap-1 border-b p-2 dark:border-zinc-800;
+    }
+    .rte-divider {
+        @apply mx-1 w-px bg-zinc-200 dark:bg-zinc-700;
+    }
+    .rte-btn {
+        @apply rounded-md border border-zinc-200 px-2 py-1 text-sm dark:border-zinc-700;
+    }
+    .rte-btn.is-active {
+        @apply bg-zinc-100 dark:bg-zinc-800;
+    }
+    .rte-surface {
+        @apply prose prose-zinc dark:prose-invert max-w-none px-3 py-2 cursor-text bg-white dark:bg-zinc-900;
+    }
+}
+
+/* Tiptap/ProseMirror tweaks */
+.ProseMirror {
+    min-height: 100%;
+    outline: none;
+}
+.ProseMirror:focus {
+    outline: none;
+}
+
+/* Placeholder text */
+.ProseMirror p.is-editor-empty:first-child::before {
+    color: #9ca3af; /* gray-400 */
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    pointer-events: none;
+}
 
 @custom-variant dark (&:is(.dark *));
 
