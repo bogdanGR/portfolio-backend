@@ -165,3 +165,12 @@
         @apply bg-background text-foreground;
     }
 }
+.btn {
+    @apply text-sm px-2 py-1 rounded-md border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 disabled:opacity-40;
+}
+.btn.is-active {
+    @apply bg-zinc-900 text-white dark:bg-zinc-100 dark:text-black;
+}
+:deep(.is-editor-empty:first-child::before) {
+    @apply text-zinc-400;
+}
