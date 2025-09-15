@@ -60,7 +60,7 @@ const handleDelete = (id: number) => {
             </Link>
 
             <Table>
-                <TableCaption>A list of your recent invoices.</TableCaption>
+                <TableCaption>A list of your recent projects.</TableCaption>
                 <TableHeader>
                     <TableRow>
                         <TableHead>ID</TableHead>
