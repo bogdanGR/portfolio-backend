@@ -63,6 +63,7 @@ const handleDelete = (id: number) => {
                 <TableCaption>A list of your recent invoices.</TableCaption>
                 <TableHeader>
                     <TableRow>
+                        <TableHead>ID</TableHead>
                         <TableHead>Name</TableHead>
                         <TableHead>Short Description</TableHead>
                         <TableHead>Github</TableHead>
@@ -74,6 +75,9 @@ const handleDelete = (id: number) => {
                         <TableCell>{{ project.id }}</TableCell>
                         <TableCell>{{ project.name }}</TableCell>
                         <TableCell>{{ project.short_description }}</TableCell>
+                        <TableCell>
+                            <a v-if="project.github" :href="project.github" target="_blank">Github projects' link</a>
+                        </TableCell>
                         <TableCell class="text-center space-x-2">
                             <Link :href="route('projects.edit', {id: project.id})">
                                 <Button>Edit</Button>

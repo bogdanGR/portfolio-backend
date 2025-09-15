@@ -10,17 +10,21 @@ interface Project {
     id: number,
     name: string,
     short_description: string,
-    long_description: string
+    long_description: string,
+    'link': string,
+    'github': string,
 }
 
 const props = defineProps<{ project: Project}>();
+
+console.log(props);
 
 const form = useForm({
     name: props.project.name,
     short_description: props.project.short_description,
     long_description: props.project.long_description,
-    link: '',
-    github_link: '',
+    link: props.project.link,
+    github: props.project.github,
 })
 
 function submit() {
@@ -99,18 +103,18 @@ function submit() {
 
                     <!-- Github Link -->
                     <div class="flex flex-col">
-                        <Label for="github_link" class="mb-1 text-gray-900 dark:text-gray-100">Github</Label>
+                        <Label for="github" class="mb-1 text-gray-900 dark:text-gray-100">Github</Label>
                         <Input
-                            v-model="form.github_link"
-                            id="github_link"
+                            v-model="form.github"
+                            id="github"
                             type="url"
                             placeholder="Github link"
                             class="w-full rounded-md border border-gray-300 bg-white text-gray-900 placeholder-gray-500
                      focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500
                      dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-400"
                         />
-                        <div v-if="form.errors.github_link" class="mt-1 text-sm text-red-600 dark:text-red-400">
-                            {{ form.errors.github_link }}
+                        <div v-if="form.errors.github" class="mt-1 text-sm text-red-600 dark:text-red-400">
+                            {{ form.errors.github }}
                         </div>
                     </div>
                 </div>
