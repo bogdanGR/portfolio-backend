@@ -66,7 +66,8 @@ const handleDelete = (id: number) => {
                         <TableHead>ID</TableHead>
                         <TableHead>Name</TableHead>
                         <TableHead>Short Description</TableHead>
-                        <TableHead>Github</TableHead>
+                        <TableHead>Website URL</TableHead>
+                        <TableHead>Github URL</TableHead>
                         <TableHead>Action</TableHead>
                     </TableRow>
                 </TableHeader>
@@ -75,6 +76,9 @@ const handleDelete = (id: number) => {
                         <TableCell>{{ project.id }}</TableCell>
                         <TableCell>{{ project.name }}</TableCell>
                         <TableCell>{{ project.short_description }}</TableCell>
+                        <TableCell>
+                            <a v-if="project.link" :href="project.link" target="_blank">Website link</a>
+                        </TableCell>
                         <TableCell>
                             <a v-if="project.github" :href="project.github" target="_blank">Github projects' link</a>
                         </TableCell>
