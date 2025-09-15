@@ -1,24 +1,24 @@
 <script setup lang="ts">
-import Button from '@/components/ui/button/Button.vue'
-import AppLayout from '@/layouts/AppLayout.vue'
-import { type BreadcrumbItem } from '@/types'
-import { Head, useForm } from '@inertiajs/vue3'
-import RichTextEditor from '@/components/RichTextEditor.vue'
+import Button from '@/components/ui/button/Button.vue';
+import AppLayout from '@/layouts/AppLayout.vue';
+import { type BreadcrumbItem } from '@/types';
+import { Head, useForm } from '@inertiajs/vue3';
+import RichTextEditor from '@/components/RichTextEditor.vue';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-const breadcrumbs: BreadcrumbItem[] = [{ title: 'Project Create', href: '/projects' }]
+const breadcrumbs: BreadcrumbItem[] = [{ title: 'Project Create', href: '/projects' }];
 
 const form = useForm({
     name: '',
     short_description: '',
     long_description: '',
     link: '',
-    github_link: '',
-})
+    github_link: ''
+});
 
 function submit() {
-    form.post(route('projects.store'))
+    form.post(route('projects.store'));
 }
 </script>
 
@@ -48,7 +48,8 @@ function submit() {
 
                     <!-- Short Description -->
                     <div class="flex flex-col">
-                        <Label for="short_description" class="mb-1 text-gray-900 dark:text-gray-100">Short Description</Label>
+                        <Label for="short_description" class="mb-1 text-gray-900 dark:text-gray-100">Short
+                            Description</Label>
                         <Input
                             v-model="form.short_description"
                             id="short_description"
@@ -63,9 +64,9 @@ function submit() {
                         </div>
                     </div>
 
-                    <!-- (Optional) Editor example: swap Textarea with your RichTextEditor and bind v-model -->
                     <div class="flex flex-col md:col-span-3">
-                        <Label for="long_description" class="mb-1 text-gray-900 dark:text-gray-100">Long Description</Label>
+                        <Label for="long_description" class="mb-1 text-gray-900 dark:text-gray-100">Long
+                            Description</Label>
                         <RichTextEditor
                             v-model="form.long_description"
                             class="rounded-md border border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-900"

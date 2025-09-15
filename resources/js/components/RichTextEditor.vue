@@ -131,31 +131,7 @@ function addImage() {
     </div>
 </template>
 
-<style scoped>
-.rte-card {
-    @apply border border-gray-300 rounded-lg overflow-hidden bg-white dark:border-gray-700 dark:bg-gray-900;
-}
 
-.rte-toolbar {
-    @apply flex flex-wrap items-center gap-1 p-2 bg-gray-50 border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700;
-}
-
-.rte-btn {
-    @apply px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed dark:text-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:hover:bg-gray-600 dark:hover:text-gray-100;
-}
-
-.rte-btn.is-active {
-    @apply bg-indigo-100 text-indigo-700 border-indigo-300 dark:bg-indigo-900 dark:text-indigo-300 dark:border-indigo-700;
-}
-
-.rte-divider {
-    @apply w-px h-6 bg-gray-300 dark:bg-gray-600;
-}
-
-.rte-surface {
-    @apply p-4 cursor-text;
-}
-</style>
 
 <style>
 /* Global styles for TipTap editor content */
