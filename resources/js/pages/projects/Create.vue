@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import Button from '@/components/ui/button/Button.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
@@ -6,7 +7,9 @@ import { Head, useForm } from '@inertiajs/vue3';
 import RichTextEditor from '@/components/RichTextEditor.vue';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import FileUploader from '@/components/FileUploader.vue';
 
+// Component setup
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Project Create', href: '/projects' }];
 
 const form = useForm({
@@ -14,11 +17,40 @@ const form = useForm({
     short_description: '',
     long_description: '',
     link: '',
-    github: ''
+    github: '',
+    images: [] as File[]
 });
 
+
+// Event handlers
+const onImagesChanged = (images: any[]) => {
+    console.log('Images changed:', images);
+};
+
+const onUploadComplete = (files: any[]) => {
+    console.log('edw!!!');
+    console.log(form.images);
+    console.log('Upload complete:', files);
+};
+
+const onUploadError = (error: string) => {
+    console.error('Upload error:', error);
+};
+
+const onFeaturedChanged = (index: number) => {
+    console.log('Featured image changed to index:', index);
+};
+
+const onImageClick = (image: any, index: number) => {
+    console.log('Image clicked:', image, index);
+};
+
 function submit() {
-    form.post(route('projects.store'));
+    console.log('form: ');
+    console.log(form.images);
+    form.post(route('projects.store'), {
+        forceFormData: true
+    });
 }
 </script>
 
@@ -108,6 +140,224 @@ function submit() {
                         <div v-if="form.errors.github" class="mt-1 text-sm text-red-600 dark:text-red-400">
                             {{ form.errors.github }}
                         </div>
+                    </div>
+<!--                    <div class="bg-white rounded-lg border border-gray-200 p-6 dark:bg-gray-800 dark:border-gray-700">-->
+<!--                        <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Project Images</h2>-->
+<!--                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">-->
+<!--                            Upload images to showcase your project. The first image will be used as the featured image.-->
+<!--                        </p>-->
+
+<!--                        &lt;!&ndash; FilePond Upload Area &ndash;&gt;-->
+<!--                        <div class="space-y-4">-->
+<!--                            <file-pond-->
+<!--                                name="images"-->
+<!--                                ref="pond"-->
+<!--                                class="filepond-custom"-->
+<!--                                :allow-multiple="true"-->
+<!--                                :max-files="10"-->
+<!--                                accepted-file-types="image/jpeg, image/png, image/gif, image/webp"-->
+<!--                                :max-file-size="'2MB'"-->
+<!--                                :image-preview-height="150"-->
+<!--                                :image-resize-target-width="800"-->
+<!--                                :image-resize-target-height="600"-->
+<!--                                :image-resize-mode="'contain'"-->
+<!--                                :image-resize-upscale="false"-->
+<!--                                :files="uploadedFiles"-->
+<!--                                label-idle='Drag & Drop your images or <span class="filepond&#45;&#45;label-action">Browse</span>'-->
+<!--                                :label-file-size-not-available="'File size not available'"-->
+<!--                                :label-file-count-singular="'image in list'"-->
+<!--                                :label-file-count-plural="'images in list'"-->
+<!--                                :label-file-loading="'Loading...'"-->
+<!--                                :label-file-processing="'Uploading...'"-->
+<!--                                :label-file-processing-complete="'Upload complete'"-->
+<!--                                :label-file-processing-aborted="'Upload cancelled'"-->
+<!--                                :label-file-processing-reverted="'Upload undone'"-->
+<!--                                :label-file-remove="'Remove'"-->
+<!--                                :label-file-remove-error="'Error during remove'"-->
+<!--                                :label-file-type-not-allowed="'File of invalid type'"-->
+<!--                                :file-validate-type-label-expected-types="'Expects images'"-->
+<!--                                :label-file-size-too-large="'File is too large'"-->
+<!--                                :label-file-size-too-small="'File is too small'"-->
+<!--                                :server="{-->
+<!--                                process: handleFileUpload,-->
+<!--                                revert: handleFileRemove,-->
+<!--                                headers: {-->
+<!--                                    'X-CSRF-TOKEN': csrfToken-->
+<!--                                }-->
+<!--                            }"-->
+<!--                                @processfile="onFileProcessed"-->
+<!--                                @removefile="onFileRemoved"-->
+<!--                                @error="onUploadError"-->
+<!--                            />-->
+
+<!--                            &lt;!&ndash; Error display &ndash;&gt;-->
+<!--                            <div v-if="uploadError" class="p-3 bg-red-50 border border-red-200 rounded-md dark:bg-red-900/20 dark:border-red-800">-->
+<!--                                <div class="flex">-->
+<!--                                    <svg class="w-5 h-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">-->
+<!--                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />-->
+<!--                                    </svg>-->
+<!--                                    <div class="ml-3">-->
+<!--                                        <p class="text-sm text-red-800 dark:text-red-400">{{ uploadError }}</p>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
+
+<!--                            &lt;!&ndash; Upload progress &ndash;&gt;-->
+<!--                            <div v-if="uploadProgress.show" class="bg-blue-50 border border-blue-200 rounded-md p-4 dark:bg-blue-900/20 dark:border-blue-800">-->
+<!--                                <div class="flex items-center">-->
+<!--                                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">-->
+<!--                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>-->
+<!--                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>-->
+<!--                                    </svg>-->
+<!--                                    <span class="text-sm text-blue-800 dark:text-blue-400">-->
+<!--                                    Uploading {{ uploadProgress.current }} of {{ uploadProgress.total }} images...-->
+<!--                                </span>-->
+<!--                                </div>-->
+<!--                            </div>-->
+
+<!--                            &lt;!&ndash; Uploaded images preview &ndash;&gt;-->
+<!--                            <div v-if="processedImages.length > 0" class="space-y-3">-->
+<!--                                <h3 class="text-sm font-medium text-gray-900 dark:text-gray-100">Uploaded Images ({{ processedImages.length }})</h3>-->
+<!--                                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">-->
+<!--                                    <div-->
+<!--                                        v-for="(image, index) in processedImages"-->
+<!--                                        :key="image.id || index"-->
+<!--                                        class="relative group aspect-square bg-gray-100 rounded-lg overflow-hidden dark:bg-gray-700"-->
+<!--                                    >-->
+<!--                                        <img-->
+<!--                                            :src="image.preview || image.url"-->
+<!--                                            :alt="image.name"-->
+<!--                                            class="w-full h-full object-cover"-->
+<!--                                        />-->
+<!--                                        &lt;!&ndash; Featured badge &ndash;&gt;-->
+<!--                                        <div v-if="index === 0" class="absolute top-2 left-2 bg-yellow-400 text-yellow-900 text-xs px-2 py-1 rounded-full font-medium">-->
+<!--                                            Featured-->
+<!--                                        </div>-->
+<!--                                        &lt;!&ndash; Remove button &ndash;&gt;-->
+<!--                                        <button-->
+<!--                                            @click="removeProcessedImage(index)"-->
+<!--                                            class="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-red-600"-->
+<!--                                            title="Remove image"-->
+<!--                                        >-->
+<!--                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">-->
+<!--                                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />-->
+<!--                                            </svg>-->
+<!--                                        </button>-->
+<!--                                        &lt;!&ndash; File name &ndash;&gt;-->
+<!--                                        <div class="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-xs p-2 truncate">-->
+<!--                                            {{ image.name }}-->
+<!--                                        </div>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+
+
+                    <FileUploader
+                        v-model="form.images"
+                        title="Project Images"
+                        description="Upload images to showcase your project. The first image will be used as the featured image."
+                        field-name="images"
+                        :max-files="10"
+                        max-file-size="2MB"
+                        :allow-multiple="true"
+                        :allow-reorder="true"
+                        :show-featured="true"
+                        :show-file-count="true"
+                        accepted-file-types="image/jpeg, image/png, image/gif, image/webp"
+                        file-type-description="images"
+                        file-singular="image"
+                        file-plural="images"
+                        label-idle='Drag & Drop your images or <span class="filepond--label-action">Browse</span>'
+                        :image-preview-height="150"
+                        :image-resize-width="800"
+                        :image-resize-height="600"
+                        image-resize-mode="contain"
+                        @files-changed="onImagesChanged"
+                        @upload-complete="onUploadComplete"
+                        @upload-error="onUploadError"
+                        @featured-changed="onFeaturedChanged"
+                        @file-click="onImageClick"
+                    >
+                        <!-- Custom image grid preview -->
+                        <template #file-preview="{ files, reorderMode, removeFile, setFeatured, onDragStart, onDragOver, onDrop, showFeatured }">
+                            <div
+                                class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4"
+                                :class="{ 'cursor-move': reorderMode }"
+                            >
+                                <div
+                                    v-for="(image, index) in files"
+                                    :key="image.id || index"
+                                    class="relative group aspect-square bg-gray-100 rounded-lg overflow-hidden dark:bg-gray-700 transition-transform duration-200"
+                                    :class="{
+                                    'hover:scale-105': !reorderMode,
+                                    'cursor-move': reorderMode,
+                                    'ring-2 ring-indigo-500': reorderMode,
+                                    'ring-2 ring-yellow-400': showFeatured && index === 0
+                                }"
+                                    @click="reorderMode ? null : onImageClick(image, index)"
+                                    draggable="true"
+                                    @dragstart="onDragStart($event, index)"
+                                    @dragover="onDragOver"
+                                    @drop="onDrop($event, index)"
+                                >
+                                    <!-- Image -->
+                                    <img
+                                        :src="image.preview || image.url"
+                                        :alt="image.name"
+                                        class="w-full h-full object-cover"
+                                    />
+
+                                    <!-- Featured badge -->
+                                    <div v-if="showFeatured && index === 0" class="absolute top-2 left-2 bg-yellow-400 text-yellow-900 text-xs px-2 py-1 rounded-full font-medium flex items-center space-x-1">
+                                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                        </svg>
+                                        <span>Featured</span>
+                                    </div>
+
+                                    <!-- Reorder indicator -->
+                                    <div v-if="reorderMode" class="absolute top-2 right-2 bg-indigo-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
+                                        {{ index + 1 }}
+                                    </div>
+
+                                    <!-- Action buttons -->
+                                    <div v-if="!reorderMode" class="absolute top-2 right-2 flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                        <!-- Set featured button -->
+                                        <button
+                                            v-if="showFeatured && index !== 0"
+                                            @click.stop="setFeatured(index)"
+                                            class="bg-yellow-500 hover:bg-yellow-600 text-white rounded-full p-1 transition-colors duration-200"
+                                            title="Set as featured"
+                                        >
+                                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                            </svg>
+                                        </button>
+
+                                        <!-- Remove button -->
+                                        <button
+                                            @click.stop="removeFile(index)"
+                                            class="bg-red-500 hover:bg-red-600 text-white rounded-full p-1 transition-colors duration-200"
+                                            title="Remove image"
+                                        >
+                                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                            </svg>
+                                        </button>
+                                    </div>
+
+                                    <!-- File name -->
+                                    <div class="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-xs p-2 truncate">
+                                        {{ image.name }}
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </FileUploader>
+                    <div v-if="form.errors.images" class="p-3 bg-red-50 border border-red-200 rounded-md dark:bg-red-900/20 dark:border-red-800">
+                        <p class="text-sm text-red-800 dark:text-red-400">{{ form.errors.images }}</p>
                     </div>
                 </div>
                 <Button type="submit" class="mt-2" :disabled="form.processing">Save</Button>
