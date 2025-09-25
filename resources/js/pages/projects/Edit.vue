@@ -34,29 +34,29 @@ const form = useForm({
 
 const removingImages = ref<number[]>([])
 function removeExistingImage(imageId: number) {
+    if(confirm('Are you sure you want to delete this image?')) {
+        if (removingImages.value.includes(imageId)) return
+        removingImages.value.push(imageId)
 
-    console.log(imageId);
-    if (removingImages.value.includes(imageId)) return
-    removingImages.value.push(imageId)
-
-    try {
-        // Adjust the route name/params to match your backend
-         router.delete(
-            route('projects.detachImage', {
-                project: props.project.id,
-                fileId: imageId,
-            }),
-            {
-                preserveScroll: true,
-                // If you keep a local list, update it here:
-                // onSuccess: () => {
-                //   existingImages.value = existingImages.value.filter(i => i.id !== imageId)
-                // },
-            }
-        )
-    } finally {
-        // remove loading state
-        removingImages.value = removingImages.value.filter(id => id !== imageId)
+        try {
+            // Adjust the route name/params to match your backend
+            router.delete(
+                route('projects.detachImage', {
+                    project: props.project.id,
+                    fileId: imageId,
+                }),
+                {
+                    preserveScroll: true,
+                    // If you keep a local list, update it here:
+                    // onSuccess: () => {
+                    //   existingImages.value = existingImages.value.filter(i => i.id !== imageId)
+                    // },
+                }
+            )
+        } finally {
+            // remove loading state
+            removingImages.value = removingImages.value.filter(id => id !== imageId)
+        }
     }
 }
 
