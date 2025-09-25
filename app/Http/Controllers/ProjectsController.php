@@ -247,9 +247,6 @@ class ProjectsController extends Controller
 
         $project->reorderFiles($request->file_ids);
 
-        return response()->json([
-            'message' => 'Images reordered successfully',
-            'project' => $project->fresh(['files'])
-        ]);
+        redirect()->back()->with('message', 'Images updated successfully!');
     }
 }

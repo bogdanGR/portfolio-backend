@@ -84,17 +84,43 @@
                     </div>
                     <!-- Existing images-->
                     <div v-if="project.files && project.files.length > 0" class="bg-white rounded-lg border border-gray-200 p-6 dark:bg-gray-800 dark:border-gray-700">
-                        <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Current Images</h2>
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Current Images</h2>
+                            <button
+                                type="button"
+                                @click="toggleReorderMode"
+                                class="px-3 py-1 text-sm rounded-md transition-colors duration-200"
+                                :class="reorderMode ?
+                'bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-800 dark:text-green-100 dark:hover:bg-green-700' :
+                'bg-indigo-100 text-indigo-800 hover:bg-indigo-200 dark:bg-indigo-800 dark:text-indigo-100 dark:hover:bg-indigo-700'"
+                            >
+                                {{ reorderMode ? 'Save Order' : 'Reorder Images' }}
+                            </button>
+                        </div>
+
                         <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">
-                            These are the current images for this project. You can remove them or add new ones below.
+                            <span v-if="!reorderMode">These are the current images for this project. You can remove them or add new ones below.</span>
+                            <span v-else class="text-indigo-600 dark:text-indigo-400 font-medium">Drag and drop images to reorder them. Click "Save Order" when finished.</span>
                         </p>
 
                         <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                             <div
-                                v-for="(image, index) in project.files"
+                                v-for="(image, index) in orderedImages"
                                 :key="image.id"
-                                class="relative group aspect-square bg-gray-100 rounded-lg overflow-hidden dark:bg-gray-700"
-                                :class="{ 'ring-2 ring-yellow-400': image.pivot?.is_featured }"
+                                class="relative group aspect-square bg-gray-100 rounded-lg overflow-hidden dark:bg-gray-700 transition-all duration-200"
+                                :class="{
+                'ring-2 ring-yellow-400': image.pivot?.is_featured,
+                'cursor-move': reorderMode,
+                'ring-2 ring-indigo-500': reorderMode,
+                'transform scale-95 opacity-75': draggedIndex === index,
+                'transform scale-105': reorderMode && hoveredIndex === index && draggedIndex !== null && draggedIndex !== index
+            }"
+                                :draggable="reorderMode"
+                                @dragstart="onDragStart($event, index)"
+                                @dragover="onDragOver($event, index)"
+                                @dragenter="onDragEnter(index)"
+                                @dragleave="onDragLeave"
+                                @drop="onDrop($event, index)"
                             >
                                 <!-- Image -->
                                 <img
@@ -111,8 +137,13 @@
                                     <span>Featured</span>
                                 </div>
 
+                                <!-- Reorder indicator -->
+                                <div v-if="reorderMode" class="absolute top-2 right-2 bg-indigo-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
+                                    {{ index + 1 }}
+                                </div>
+
                                 <!-- Action buttons -->
-                                <div class="absolute top-2 right-2 flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                <div v-if="!reorderMode" class="absolute top-2 right-2 flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                                     <!-- Set featured button -->
                                     <button
                                         type="button"
@@ -149,6 +180,15 @@
                                     {{ image.original_name }}
                                 </div>
                             </div>
+                        </div>
+
+                        <!-- Loading indicator for reordering -->
+                        <div v-if="reorderingImages" class="mt-4 flex items-center justify-center text-sm text-gray-600 dark:text-gray-400">
+                            <svg class="animate-spin w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Saving new order...
                         </div>
                     </div>
 
@@ -273,7 +313,7 @@ import { Head, useForm } from '@inertiajs/vue3'
 import RichTextEditor from '@/components/RichTextEditor.vue'
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { router } from '@inertiajs/vue3'
 import FileUploader from '@/components/FileUploader.vue';
 
@@ -299,6 +339,12 @@ const form = useForm({
     github: props.project.github,
     images: [] as File[],
 })
+
+const reorderMode = ref(false)
+const reorderingImages = ref(false)
+const orderedImages = ref([...props.project.files])
+const draggedIndex = ref<number | null>(null)
+const hoveredIndex = ref<number | null>(null)
 
 const removingImages = ref<number[]>([])
 function removeExistingImage(imageId: number) {
@@ -370,4 +416,116 @@ const onFeaturedChanged = (index: number) => {
 const onImageClick = (image: any, index: number) => {
     console.log('Image clicked:', image, index);
 };
+// Update orderedImages when project files change
+watch(() => props.project.files, (newFiles) => {
+    orderedImages.value = [...newFiles]
+}, { deep: true })
+
+// Toggle reorder mode
+function toggleReorderMode() {
+    if (reorderMode.value) {
+        // Save the new order
+        saveImageOrder()
+    } else {
+        // Enter reorder mode
+        reorderMode.value = true
+    }
+}
+
+// Drag and drop handlers
+function onDragStart(event: DragEvent, index: number) {
+    if (!reorderMode.value) return
+
+    draggedIndex.value = index
+    event.dataTransfer!.effectAllowed = 'move'
+    event.dataTransfer!.setData('text/html', index.toString())
+
+    // Add some visual feedback
+    if (event.target instanceof HTMLElement) {
+        event.target.style.opacity = '0.5'
+    }
+}
+
+function onDragOver(event: DragEvent, index: number) {
+    if (!reorderMode.value || draggedIndex.value === null) return
+
+    event.preventDefault()
+    event.dataTransfer!.dropEffect = 'move'
+}
+
+function onDragEnter(index: number) {
+    if (!reorderMode.value || draggedIndex.value === null) return
+    hoveredIndex.value = index
+}
+
+function onDragLeave() {
+    hoveredIndex.value = null
+}
+
+function onDrop(event: DragEvent, dropIndex: number) {
+    if (!reorderMode.value || draggedIndex.value === null) return
+
+    event.preventDefault()
+
+    const dragIndex = draggedIndex.value
+
+    if (dragIndex !== dropIndex) {
+        // Create new array with reordered items
+        const newOrderedImages = [...orderedImages.value]
+        const draggedItem = newOrderedImages[dragIndex]
+
+        // Remove the dragged item
+        newOrderedImages.splice(dragIndex, 1)
+
+        // Insert it at the new position
+        newOrderedImages.splice(dropIndex, 0, draggedItem)
+
+        orderedImages.value = newOrderedImages
+    }
+
+    // Reset drag state
+    draggedIndex.value = null
+    hoveredIndex.value = null
+
+    // Reset visual feedback
+    if (event.target instanceof HTMLElement) {
+        const draggedElement = document.querySelector('[style*="opacity: 0.5"]') as HTMLElement
+        if (draggedElement) {
+            draggedElement.style.opacity = ''
+        }
+    }
+}
+
+// Save the new image order
+async function saveImageOrder() {
+    reorderingImages.value = true
+
+    try {
+        const fileIds = orderedImages.value.map(image => image.id)
+
+        await router.post(
+            route('projects.reorderImages', { project: props.project.id }),
+            { file_ids: fileIds },
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    reorderMode.value = false
+                    // Update the project files with the new order
+                    props.project.files = [...orderedImages.value]
+                },
+                onError: (errors) => {
+                    console.error('Failed to reorder images:', errors)
+                    // Reset to original order on error
+                    orderedImages.value = [...props.project.files]
+                }
+            }
+        )
+    } catch (error) {
+        console.error('Error reordering images:', error)
+        // Reset to original order on error
+        orderedImages.value = [...props.project.files]
+    } finally {
+        reorderingImages.value = false
+    }
+}
 </script>
