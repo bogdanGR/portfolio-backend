@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Project extends Model
 {
@@ -15,7 +16,7 @@ class Project extends Model
         return $this->belongsToMany(File::class, 'project_files')
             ->withPivot(['sort_order', 'is_featured'])
             ->withTimestamps()
-            ->orderBy('pivot_sort_order');
+            ->orderBy('sort_order');
     }
 
     public function images()
@@ -73,6 +74,15 @@ class Project extends Model
     public function detachFile($fileId)
     {
         return $this->files()->detach($fileId);
+    }
+
+    public function findFileById(int $id): File
+    {
+        return  $this->files()->where(['project_files.id' => $id, 'project_files.project_id' => $this->id])->first();
+    }
+    public function removeFile($fileId)
+    {
+        return $this->findFileById($fileId)->delete();
     }
 
     public function setFeaturedImage($fileId)

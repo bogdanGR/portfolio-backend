@@ -6,6 +6,7 @@ import RichTextEditor from '@/components/RichTextEditor.vue'
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { computed, ref } from 'vue';
+import { router } from '@inertiajs/vue3'
 import FileUploader from '@/components/FileUploader.vue';
 
 interface Project {
@@ -32,16 +33,18 @@ const form = useForm({
 })
 
 const removingImages = ref<number[]>([])
-async function removeExistingImage(imageId: number) {
+function removeExistingImage(imageId: number) {
+
+    console.log(imageId);
     if (removingImages.value.includes(imageId)) return
     removingImages.value.push(imageId)
 
     try {
         // Adjust the route name/params to match your backend
-        await router.delete(
-            route('projects.images.destroy', {
+         router.delete(
+            route('projects.detachImage', {
                 project: props.project.id,
-                image: imageId,
+                fileId: imageId,
             }),
             {
                 preserveScroll: true,
@@ -60,10 +63,10 @@ async function removeExistingImage(imageId: number) {
 async function setFeaturedExistingImage(imageId: number) {
     // Optional loading state for feature toggling
     try {
-        await router.put(
-            route('projects.images.feature', {
+        await router.post(
+            route('projects.setFeaturedImage', {
                 project: props.project.id,
-                image: imageId,
+                fileId: imageId,
             }),
             {},
             { preserveScroll: true }
@@ -86,6 +89,7 @@ async function setFeaturedExistingImage(imageId: number) {
 //const hasRequiredImages = computed(() => form.images.length > 0);
 
 function submit() {
+    console.log('submit update!');
     console.log('payload:', form.data()) // should show your values
 
     form.transform(data => ({
@@ -222,77 +226,79 @@ const onImageClick = (image: any, index: number) => {
                         </div>
                     </div>
                     <!-- Existing images-->
-<!--                    <div v-if="project.files && project.files.length > 0" class="bg-white rounded-lg border border-gray-200 p-6 dark:bg-gray-800 dark:border-gray-700">-->
-<!--                        <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Current Images</h2>-->
-<!--                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">-->
-<!--                            These are the current images for this project. You can remove them or add new ones below.-->
-<!--                        </p>-->
+                    <div v-if="project.files && project.files.length > 0" class="bg-white rounded-lg border border-gray-200 p-6 dark:bg-gray-800 dark:border-gray-700">
+                        <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Current Images</h2>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">
+                            These are the current images for this project. You can remove them or add new ones below.
+                        </p>
 
-<!--                        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">-->
-<!--                            <div-->
-<!--                                v-for="(image, index) in project.files"-->
-<!--                                :key="image.id"-->
-<!--                                class="relative group aspect-square bg-gray-100 rounded-lg overflow-hidden dark:bg-gray-700"-->
-<!--                                :class="{ 'ring-2 ring-yellow-400': image.pivot?.is_featured }"-->
-<!--                            >-->
-<!--                                &lt;!&ndash; Image &ndash;&gt;-->
-<!--                                <img-->
-<!--                                    :src="image.url"-->
-<!--                                    :alt="image.original_name"-->
-<!--                                    class="w-full h-full object-cover"-->
-<!--                                />-->
+                        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                            <div
+                                v-for="(image, index) in project.files"
+                                :key="image.id"
+                                class="relative group aspect-square bg-gray-100 rounded-lg overflow-hidden dark:bg-gray-700"
+                                :class="{ 'ring-2 ring-yellow-400': image.pivot?.is_featured }"
+                            >
+                                <!-- Image -->
+                                <img
+                                    :src="image.url"
+                                    :alt="image.original_name"
+                                    class="w-full h-full object-cover"
+                                />
 
-<!--                                &lt;!&ndash; Featured badge &ndash;&gt;-->
-<!--                                <div v-if="image.pivot?.is_featured" class="absolute top-2 left-2 bg-yellow-400 text-yellow-900 text-xs px-2 py-1 rounded-full font-medium flex items-center space-x-1">-->
-<!--                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">-->
-<!--                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>-->
-<!--                                    </svg>-->
-<!--                                    <span>Featured</span>-->
-<!--                                </div>-->
+                                <!-- Featured badge -->
+                                <div v-if="image.pivot?.is_featured" class="absolute top-2 left-2 bg-yellow-400 text-yellow-900 text-xs px-2 py-1 rounded-full font-medium flex items-center space-x-1">
+                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                    </svg>
+                                    <span>Featured</span>
+                                </div>
 
-<!--                                &lt;!&ndash; Action buttons &ndash;&gt;-->
-<!--                                <div class="absolute top-2 right-2 flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">-->
-<!--                                    &lt;!&ndash; Set featured button &ndash;&gt;-->
-<!--                                    <button-->
-<!--                                        v-if="!image.pivot?.is_featured"-->
-<!--                                        @click.stop="setFeaturedExistingImage(image.id)"-->
-<!--                                        class="bg-yellow-500 hover:bg-yellow-600 text-white rounded-full p-1 transition-colors duration-200"-->
-<!--                                        title="Set as featured"-->
-<!--                                    >-->
-<!--                                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">-->
-<!--                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>-->
-<!--                                        </svg>-->
-<!--                                    </button>-->
+                                <!-- Action buttons -->
+                                <div class="absolute top-2 right-2 flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                    <!-- Set featured button -->
+                                    <button
+                                        type="button"
+                                        v-if="!image.pivot?.is_featured"
+                                        @click.stop="setFeaturedExistingImage(image.id)"
+                                        class="bg-yellow-500 hover:bg-yellow-600 text-white rounded-full p-1 transition-colors duration-200"
+                                        title="Set as featured"
+                                    >
+                                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                        </svg>
+                                    </button>
 
-<!--                                    &lt;!&ndash; Remove button &ndash;&gt;-->
-<!--                                    <button-->
-<!--                                        @click.stop="removeExistingImage(image.id)"-->
-<!--                                        class="bg-red-500 hover:bg-red-600 text-white rounded-full p-1 transition-colors duration-200"-->
-<!--                                        title="Remove image"-->
-<!--                                        :disabled="removingImages.includes(image.id)"-->
-<!--                                    >-->
-<!--                                        <svg v-if="removingImages.includes(image.id)" class="animate-spin w-3 h-3" fill="none" viewBox="0 0 24 24">-->
-<!--                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>-->
-<!--                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>-->
-<!--                                        </svg>-->
-<!--                                        <svg v-else class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">-->
-<!--                                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />-->
-<!--                                        </svg>-->
-<!--                                    </button>-->
-<!--                                </div>-->
+                                    <!-- Remove button -->
+                                    <button
+                                        type="button"
+                                        @click.stop="removeExistingImage(image.id)"
+                                        class="bg-red-500 hover:bg-red-600 text-white rounded-full p-1 transition-colors duration-200"
+                                        title="Remove image"
+                                        :disabled="removingImages.includes(image.id)"
+                                    >
+                                        <svg v-if="removingImages.includes(image.id)" class="animate-spin w-3 h-3" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        <svg v-else class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                        </svg>
+                                    </button>
+                                </div>
 
-<!--                                &lt;!&ndash; File name &ndash;&gt;-->
-<!--                                <div class="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-xs p-2 truncate">-->
-<!--                                    {{ image.original_name }}-->
-<!--                                </div>-->
-<!--                            </div>-->
-<!--                        </div>-->
-<!--                    </div>-->
+                                <!-- File name -->
+                                <div class="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-xs p-2 truncate">
+                                    {{ image.original_name }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                     <!-- Add New Images Section -->
                     <FileUploader
                         v-model="form.images"
-                        :existing-files="project.files"
+
                         title="Add New Images"
                         description="Upload additional images for your project. New images will be added to existing ones."
                         field-name="images"

@@ -475,6 +475,7 @@ defineExpose({
                             Uploaded {{ filePlural }} ({{ processedFiles.length }})
                         </h3>
                         <button
+                            type="button"
                             v-if="allowReorder && processedFiles.length > 1"
                             @click="toggleReorderMode"
                             class="text-sm text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300"
@@ -535,6 +536,7 @@ defineExpose({
                                     <div v-if="!reorderMode" class="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                                         <!-- Set featured button -->
                                         <button
+                                            type="button"
                                             v-if="showFeatured && index !== 0"
                                             @click.stop="setFeaturedFile(index)"
                                             class="p-1 bg-yellow-500 hover:bg-yellow-600 text-white rounded transition-colors duration-200"
@@ -547,6 +549,7 @@ defineExpose({
 
                                         <!-- Remove button -->
                                         <button
+                                            type="button"
                                             @click.stop="removeProcessedFile(index)"
                                             class="p-1 bg-red-500 hover:bg-red-600 text-white rounded transition-colors duration-200"
                                             title="Remove file"

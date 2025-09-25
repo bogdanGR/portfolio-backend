@@ -222,20 +222,16 @@ class ProjectsController extends Controller
 
     public function detachImage(Project $project, $fileId)
     {
+        $project->removeFile($fileId);
         $project->detachFile($fileId);
-        return response()->json([
-            'message' => 'Image detached successfully',
-            'project' => $project->fresh(['files'])
-        ]);
+
+        redirect()->back();
     }
 
     public function setFeaturedImage(Project $project, $fileId)
     {
         $project->setFeaturedImage($fileId);
-        return response()->json([
-            'message' => 'Featured image updated',
-            'project' => $project->fresh(['files'])
-        ]);
+        redirect()->back()->with('message', 'Featured image updated successfully!');
     }
 
     public function reorderImages(Request $request, Project $project)

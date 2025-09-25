@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
-use PhpParser\Node\Expr\Cast\Bool_;
 
 class File extends Model
 {
+    protected $primaryKey = 'id';
+
     protected $fillable = [
         'original_name',
         'filename',
@@ -42,12 +43,9 @@ class File extends Model
     protected static function boot()
     {
         parent::boot();
-
         static::deleting(function ($file) {
-            // Only delete file if not used elsewhere
-            if ($file->projects()->count() === 0 && $file->blogs()->count() === 0) {
-                Storage::delete($file->path);
-            }
+//          unlink(storage_path($file->path));
+            Storage::disk('public')->delete($file->path);
         });
     }
 }
