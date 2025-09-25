@@ -1,58 +1,5 @@
-<script setup lang="ts">
-import { computed } from 'vue';
-import Button from '@/components/ui/button/Button.vue';
-import AppLayout from '@/layouts/AppLayout.vue';
-import { type BreadcrumbItem } from '@/types';
-import { Head, useForm } from '@inertiajs/vue3';
-import RichTextEditor from '@/components/RichTextEditor.vue';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import FileUploader from '@/components/FileUploader.vue';
-
-// Component setup
-const breadcrumbs: BreadcrumbItem[] = [{ title: 'Project Create', href: '/projects' }];
-
-const form = useForm({
-    name: '',
-    short_description: '',
-    long_description: '',
-    link: '',
-    github: '',
-    images: [] as File[]
-});
-
-
-// Event handlers
-const onImagesChanged = (images: any[]) => {
-    console.log('Images changed:', images);
-};
-
-const onUploadComplete = (files: any[]) => {
-    console.log('Upload complete:', files);
-};
-
-const onUploadError = (error: string) => {
-    console.error('Upload error:', error);
-};
-
-const onFeaturedChanged = (index: number) => {
-    console.log('Featured image changed to index:', index);
-};
-
-const onImageClick = (image: any, index: number) => {
-    console.log('Image clicked:', image, index);
-};
-
-function submit() {
-    form.post(route('projects.store'), {
-        forceFormData: true
-    });
-}
-</script>
-
 <template>
     <Head title="Project Create" />
-
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="container mx-auto p-4">
             <form @submit.prevent="submit" class="space-y-6">
@@ -249,3 +196,55 @@ function submit() {
         </div>
     </AppLayout>
 </template>
+
+<script setup lang="ts">
+import { computed } from 'vue';
+import Button from '@/components/ui/button/Button.vue';
+import AppLayout from '@/layouts/AppLayout.vue';
+import { type BreadcrumbItem } from '@/types';
+import { Head, useForm } from '@inertiajs/vue3';
+import RichTextEditor from '@/components/RichTextEditor.vue';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import FileUploader from '@/components/FileUploader.vue';
+
+// Component setup
+const breadcrumbs: BreadcrumbItem[] = [{ title: 'Project Create', href: '/projects' }];
+
+const form = useForm({
+    name: '',
+    short_description: '',
+    long_description: '',
+    link: '',
+    github: '',
+    images: [] as File[]
+});
+
+
+// Event handlers
+const onImagesChanged = (images: any[]) => {
+    console.log('Images changed:', images);
+};
+
+const onUploadComplete = (files: any[]) => {
+    console.log('Upload complete:', files);
+};
+
+const onUploadError = (error: string) => {
+    console.error('Upload error:', error);
+};
+
+const onFeaturedChanged = (index: number) => {
+    console.log('Featured image changed to index:', index);
+};
+
+const onImageClick = (image: any, index: number) => {
+    console.log('Image clicked:', image, index);
+};
+
+function submit() {
+    form.post(route('projects.store'), {
+        forceFormData: true
+    });
+}
+</script>

@@ -1,112 +1,5 @@
-<script setup lang="ts">
-import Button from '@/components/ui/button/Button.vue'
-import AppLayout from '@/layouts/AppLayout.vue'
-import { Head, useForm } from '@inertiajs/vue3'
-import RichTextEditor from '@/components/RichTextEditor.vue'
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { computed, ref } from 'vue';
-import { router } from '@inertiajs/vue3'
-import FileUploader from '@/components/FileUploader.vue';
-
-interface Project {
-    id: number,
-    name: string,
-    short_description: string,
-    long_description: string,
-    'link': string,
-    'github': string,
-    'images': array,
-}
-
-const props = defineProps<{ project: Project}>();
-
-console.log(props);
-
-const form = useForm({
-    name: props.project.name,
-    short_description: props.project.short_description,
-    long_description: props.project.long_description,
-    link: props.project.link,
-    github: props.project.github,
-    images: [] as File[],
-})
-
-const removingImages = ref<number[]>([])
-function removeExistingImage(imageId: number) {
-    if(confirm('Are you sure you want to delete this image?')) {
-        if (removingImages.value.includes(imageId)) return
-        removingImages.value.push(imageId)
-
-        try {
-            router.delete(
-                route('projects.detachImage', {
-                    project: props.project.id,
-                    fileId: imageId,
-                }),
-                {
-                    preserveScroll: true,
-                }
-            )
-        } finally {
-            // remove loading state
-            removingImages.value = removingImages.value.filter(id => id !== imageId)
-        }
-    }
-}
-
-function setFeaturedExistingImage(imageId: number) {
-    // Optional loading state for feature toggling
-    try {
-        router.post(
-            route('projects.setFeaturedImage', {
-                project: props.project.id,
-                fileId: imageId,
-            }),
-            {},
-            { preserveScroll: true }
-        )
-    } catch (e) {
-        console.error(e)
-    }
-}
-
-function submit() {
-    form.transform(data => ({
-        ...data,
-        _method: 'put',
-    })).post(route('projects.update', { project: props.project.id }), {
-        forceFormData: true,      // ensures multipart/form-data
-        preserveScroll: true,
-    })
-}
-
-
-// Event handlers
-const onImagesChanged = (images: any[]) => {
-    console.log('Images changed:', images);
-};
-
-const onUploadComplete = (files: any[]) => {
-    console.log('Upload complete:', files);
-};
-
-const onUploadError = (error: string) => {
-    console.error('Upload error:', error);
-};
-
-const onFeaturedChanged = (index: number) => {
-    console.log('Featured image changed to index:', index);
-};
-
-const onImageClick = (image: any, index: number) => {
-    console.log('Image clicked:', image, index);
-};
-</script>
-
 <template>
     <Head title="Project Edit" />
-
     <AppLayout :breadcrumbs="[{ title: 'Project Edit', href: `/projects/${props.project.id}/edit` }]">
         <div class="container mx-auto p-4">
             <form @submit.prevent="submit" class="space-y-6">
@@ -372,3 +265,109 @@ const onImageClick = (image: any, index: number) => {
         </div>
     </AppLayout>
 </template>
+
+<script setup lang="ts">
+import Button from '@/components/ui/button/Button.vue'
+import AppLayout from '@/layouts/AppLayout.vue'
+import { Head, useForm } from '@inertiajs/vue3'
+import RichTextEditor from '@/components/RichTextEditor.vue'
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { computed, ref } from 'vue';
+import { router } from '@inertiajs/vue3'
+import FileUploader from '@/components/FileUploader.vue';
+
+interface Project {
+    id: number,
+    name: string,
+    short_description: string,
+    long_description: string,
+    'link': string,
+    'github': string,
+    'images': array,
+}
+
+const props = defineProps<{ project: Project}>();
+
+console.log(props);
+
+const form = useForm({
+    name: props.project.name,
+    short_description: props.project.short_description,
+    long_description: props.project.long_description,
+    link: props.project.link,
+    github: props.project.github,
+    images: [] as File[],
+})
+
+const removingImages = ref<number[]>([])
+function removeExistingImage(imageId: number) {
+    if(confirm('Are you sure you want to delete this image?')) {
+        if (removingImages.value.includes(imageId)) return
+        removingImages.value.push(imageId)
+
+        try {
+            router.delete(
+                route('projects.detachImage', {
+                    project: props.project.id,
+                    fileId: imageId,
+                }),
+                {
+                    preserveScroll: true,
+                }
+            )
+        } finally {
+            // remove loading state
+            removingImages.value = removingImages.value.filter(id => id !== imageId)
+        }
+    }
+}
+
+function setFeaturedExistingImage(imageId: number) {
+    // Optional loading state for feature toggling
+    try {
+        router.post(
+            route('projects.setFeaturedImage', {
+                project: props.project.id,
+                fileId: imageId,
+            }),
+            {},
+            { preserveScroll: true }
+        )
+    } catch (e) {
+        console.error(e)
+    }
+}
+
+function submit() {
+    form.transform(data => ({
+        ...data,
+        _method: 'put',
+    })).post(route('projects.update', { project: props.project.id }), {
+        forceFormData: true,      // ensures multipart/form-data
+        preserveScroll: true,
+    })
+}
+
+
+// Event handlers
+const onImagesChanged = (images: any[]) => {
+    console.log('Images changed:', images);
+};
+
+const onUploadComplete = (files: any[]) => {
+    console.log('Upload complete:', files);
+};
+
+const onUploadError = (error: string) => {
+    console.error('Upload error:', error);
+};
+
+const onFeaturedChanged = (index: number) => {
+    console.log('Featured image changed to index:', index);
+};
+
+const onImageClick = (image: any, index: number) => {
+    console.log('Image clicked:', image, index);
+};
+</script>
