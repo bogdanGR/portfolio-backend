@@ -39,7 +39,6 @@ function removeExistingImage(imageId: number) {
         removingImages.value.push(imageId)
 
         try {
-            // Adjust the route name/params to match your backend
             router.delete(
                 route('projects.detachImage', {
                     project: props.project.id,
@@ -47,10 +46,6 @@ function removeExistingImage(imageId: number) {
                 }),
                 {
                     preserveScroll: true,
-                    // If you keep a local list, update it here:
-                    // onSuccess: () => {
-                    //   existingImages.value = existingImages.value.filter(i => i.id !== imageId)
-                    // },
                 }
             )
         } finally {
@@ -60,10 +55,10 @@ function removeExistingImage(imageId: number) {
     }
 }
 
-async function setFeaturedExistingImage(imageId: number) {
+function setFeaturedExistingImage(imageId: number) {
     // Optional loading state for feature toggling
     try {
-        await router.post(
+        router.post(
             route('projects.setFeaturedImage', {
                 project: props.project.id,
                 fileId: imageId,
@@ -71,27 +66,12 @@ async function setFeaturedExistingImage(imageId: number) {
             {},
             { preserveScroll: true }
         )
-        // If you keep a local list, also mark the featured one locally:
-        // const idx = existingImages.value.findIndex(i => i.id === imageId)
-        // if (idx !== -1) {
-        //   existingImages.value.forEach(i => (i.pivot = { ...(i.pivot || {}), is_featured: false }))
-        //   existingImages.value[idx].pivot = { ...(existingImages.value[idx].pivot || {}), is_featured: true }
-        // }
     } catch (e) {
         console.error(e)
     }
 }
 
-// function submit() {
-//     console.log(form);
-//     form.put(route('projects.update', { project: props.project.id }))
-// }
-//const hasRequiredImages = computed(() => form.images.length > 0);
-
 function submit() {
-    console.log('submit update!');
-    console.log('payload:', form.data()) // should show your values
-
     form.transform(data => ({
         ...data,
         _method: 'put',
@@ -122,22 +102,6 @@ const onFeaturedChanged = (index: number) => {
 const onImageClick = (image: any, index: number) => {
     console.log('Image clicked:', image, index);
 };
-
-// function submit() {
-//     console.log('payload:', form.data())
-//
-//     form.transform(data => ({
-//         ...data,
-//         _method: 'put',           // Laravel method spoofing
-//     })).post(
-//         route('projects.update', { project: props.project.id }),
-//         {
-//             forceFormData: true,    // ensure multipart/form-data
-//             preserveScroll: true,
-//         }
-//     )
-// }
-
 </script>
 
 <template>
