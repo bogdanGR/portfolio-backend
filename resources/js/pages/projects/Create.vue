@@ -135,7 +135,7 @@
                                 >
                                     <!-- Image -->
                                     <img
-                                        :src="image.preview || image.url"
+                                        :src="image.preview"
                                         :alt="image.name"
                                         class="w-full h-full object-cover"
                                     />

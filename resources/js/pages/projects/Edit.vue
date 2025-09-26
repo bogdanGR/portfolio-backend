@@ -241,10 +241,9 @@
                                     @dragover="onDragOver"
                                     @drop="onDrop($event, index)"
                                 >
-                                    {{ console.log(image) }}
                                     <!-- Image -->
                                     <img
-                                        :src="image.preview || image.url || image.name"
+                                        :src="image.preview"
                                         :alt="image.name"
                                         class="w-full h-full object-cover"
                                     />
