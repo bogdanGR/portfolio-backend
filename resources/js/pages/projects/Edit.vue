@@ -219,6 +219,7 @@
                         @upload-error="onUploadError"
                         @featured-changed="onFeaturedChanged"
                         @file-click="onImageClick"
+                        @uploading-change="onUploadingChange"
                     >
                         <template #file-preview="{ files, reorderMode, removeFile, setFeatured, onDragStart, onDragOver, onDrop, showFeatured }">
                             <div
@@ -299,7 +300,7 @@
                         <p class="text-sm text-red-800 dark:text-red-400">{{ form.errors.images }}</p>
                     </div>
                 </div>
-                <Button type="submit" class="mt-2" :disabled="form.processing">Save</Button>
+                <Button type="submit" class="mt-2" :disabled="form.processing || isUploading">Save</Button>
             </form>
         </div>
     </AppLayout>
@@ -327,9 +328,6 @@ interface Project {
 }
 
 const props = defineProps<{ project: Project}>();
-
-console.log(props);
-
 const form = useForm({
     name: props.project.name,
     short_description: props.project.short_description,
@@ -344,6 +342,7 @@ const reorderingImages = ref(false)
 const orderedImages = ref([...props.project.files])
 const draggedIndex = ref<number | null>(null)
 const hoveredIndex = ref<number | null>(null)
+const isUploading = ref(false)
 
 const removingImages = ref<number[]>([])
 function removeExistingImage(imageId: number) {
@@ -384,7 +383,15 @@ function setFeaturedExistingImage(imageId: number) {
     }
 }
 
+function onUploadingChange(busy: boolean) {
+    isUploading.value = busy
+}
+
 function submit() {
+    if (isUploading.value) {
+        return;
+    }
+
     form.transform(data => ({
         ...data,
         _method: 'put',

@@ -45,7 +45,10 @@
                             'X-CSRF-TOKEN': csrfToken
                         }
                     }"
+                    @addfilestart="onAddFileStart"
                     @processfile="onFileProcessed"
+                    @processfileabort="onProcessFileAbort"
+                    @processfilerevert="onProcessFileRevert"
                     @removefile="onFileRemoved"
                     @error="onUploadError"
                     @init="onFilePondInit"
@@ -278,6 +281,7 @@ const props = withDefaults(defineProps<Props>(), {
     modelValue: () => []
 });
 
+
 // Emits
 const emit = defineEmits<{
     'update:modelValue': [files: File[]];
@@ -286,8 +290,11 @@ const emit = defineEmits<{
     'featured-changed': [index: number];
     'upload-complete': [files: ProcessedFile[]];
     'upload-error': [error: string];
+    'uploading-change': [busy: boolean];
+
 }>();
 
+const activeUploads = ref(0);
 // Refs
 const pond = ref();
 const uploadedFiles = ref([]);
@@ -306,6 +313,10 @@ const csrfToken = computed(() => {
     const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
     return token || '';
 });
+
+function setBusyFromCounter() {
+    emit('uploading-change', activeUploads.value > 0);
+}
 
 // File upload handler
 const handleFileUpload = async (fieldName: string, file: File, metadata: any, load: Function, error: Function, progress: Function, abort: Function) => {
@@ -403,8 +414,24 @@ const loadExistingFile = (source: any, load: Function, error: Function, progress
     load();
 };
 
+function onAddFileStart() {
+    activeUploads.value++;
+    setBusyFromCounter();
+}
+function onProcessFileRevert() {
+    if (activeUploads.value > 0) activeUploads.value--
+    setBusyFromCounter()
+}
+function onProcessFileAbort() {
+    if (activeUploads.value > 0) activeUploads.value--
+    setBusyFromCounter()
+}
 // Event handlers
 const onFileProcessed = (error: any, file: any) => {
+
+    if (activeUploads.value > 0) activeUploads.value--;
+    setBusyFromCounter();
+
     if (error) {
         console.error('File processing error:', error);
         uploadError.value = 'Error processing file: ' + file.filename;
@@ -415,6 +442,8 @@ const onFileProcessed = (error: any, file: any) => {
 };
 
 const onFileRemoved = (error: any, fileItem: any) => {
+    if (activeUploads.value > 0) activeUploads.value--;
+    setBusyFromCounter();
     if (error) {
         console.error('File removal error:', error);
         return;

@@ -110,6 +110,7 @@
                         @upload-error="onUploadError"
                         @featured-changed="onFeaturedChanged"
                         @file-click="onImageClick"
+                        @uploading-change="onUploadingChange"
                     >
                         <!-- Custom image grid preview -->
                         <template #file-preview="{ files, reorderMode, removeFile, setFeatured, onDragStart, onDragOver, onDrop, showFeatured }">
@@ -191,14 +192,14 @@
                         <p class="text-sm text-red-800 dark:text-red-400">{{ form.errors.images }}</p>
                     </div>
                 </div>
-                <Button type="submit" class="mt-2" :disabled="form.processing">Save</Button>
+                <Button type="submit" class="mt-2" :disabled="form.processing || isUploading">Save</Button>
             </form>
         </div>
     </AppLayout>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import Button from '@/components/ui/button/Button.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
@@ -219,7 +220,12 @@ const form = useForm({
     github: '',
     images: [] as File[]
 });
+const isUploading = ref(false)
 
+
+function onUploadingChange(busy: boolean) {
+    isUploading.value = busy
+}
 
 // Event handlers
 const onImagesChanged = (images: any[]) => {
@@ -243,6 +249,10 @@ const onImageClick = (image: any, index: number) => {
 };
 
 function submit() {
+    if (isUploading.value) {
+        return;
+    }
+
     form.post(route('projects.store'), {
         forceFormData: true
     });
