@@ -38,7 +38,17 @@
                             {{ form.errors.short_description }}
                         </div>
                     </div>
-
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Technologies</label>
+                        <TechnologyMultiSelect
+                            v-model="form.technology_ids"
+                            :options="technologies"
+                            placeholder="Search technologies…"
+                        />
+                        <div v-if="form.errors.technology_ids" class="text-red-600 text-sm mt-1">
+                            {{ form.errors.technology_ids }}
+                        </div>
+                    </div>
                     <div class="flex flex-col md:col-span-3">
                         <Label for="long_description" class="mb-1 text-gray-900 dark:text-gray-100">Long
                             Description</Label>
@@ -208,9 +218,14 @@ import RichTextEditor from '@/components/RichTextEditor.vue';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import FileUploader from '@/components/FileUploader.vue';
+import TechnologyMultiSelect, { type TechnologyOption } from '@/components/ui/technology-multi-select/TechnologyMultiSelect.vue';
 
 // Component setup
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Project Create', href: '/projects' }];
+
+const props = defineProps<{
+    technologies: TechnologyOption[]
+}>()
 
 const form = useForm({
     name: '',
@@ -218,7 +233,8 @@ const form = useForm({
     long_description: '',
     link: '',
     github: '',
-    images: [] as File[]
+    images: [] as File[],
+    technology_ids: [] as { id: number; sort_order?: number; }[],
 });
 const isUploading = ref(false)
 

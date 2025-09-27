@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Project;
 use App\Models\File;
+use App\Models\Technology;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -14,16 +15,22 @@ class ProjectsController extends Controller
 {
     public function index()
     {
-        $projects = Project::with(['files' => function($query) {
-            $query->orderBy('project_files.sort_order');
-        }])->get();
+        $projects = Project::with([
+            'files' => function ($query) {
+                $query->orderBy('project_files.sort_order');
+            },
+            'technologies' => function ($query) {
+                $query->orderBy('project_technology.sort_order');
+            }
+        ])->get();
 
         return Inertia::render('projects/Index', compact('projects'));
     }
 
     public function create()
     {
-        return Inertia::render('projects/Create');
+        $technologies = Technology::all();
+        return Inertia::render('projects/Create', ['technologies' => $technologies]);
     }
 
     public function store(Request $request)
@@ -40,7 +47,9 @@ class ProjectsController extends Controller
             'link' => 'nullable|url',
             'github' => 'nullable|url',
             'images' => 'nullable|array',
-            'images.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:2048'
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'technology_ids' => ['array'],
+            'technology_ids.*' => ['integer', 'exists:technologies,id'],
             ]);
 
         DB::beginTransaction();
@@ -58,6 +67,12 @@ class ProjectsController extends Controller
             if ($request->hasFile('images')) {
                 $this->handleImageUploads($project, $request->file('images'));
             }
+
+            $data = [];
+            foreach ($request->input('technology_ids', []) as $index => $techId) {
+                $data[$techId] = ['sort_order' => $index + 1];
+            }
+            $project->technologies()->sync($data);
 
             DB::commit();
 
@@ -77,11 +92,27 @@ class ProjectsController extends Controller
 
     public function edit(Project $project)
     {
-        $project->load(['files' => function($query) {
-            $query->orderBy('project_files.sort_order');
-        }]);
+        $project->load([
+            'technologies:id,name', // for selected ids
+            'files' => fn ($q) => $q->orderBy('project_files.sort_order'),
+        ]);
 
-        return Inertia::render('projects/Edit', compact('project'));
+        // 1) All options for the multiselect
+        $technologiesAll = Technology::select('id','name','slug','category')
+            ->orderBy('name')
+            ->get();
+
+        // 2) Selected IDs for this project (plain array)
+        $technologySelectedIds = $project->technologies
+            ->pluck('id')
+            ->values()
+            ->all();
+
+        return Inertia::render('projects/Edit', [
+            'project' => $project,
+            'technologiesAll' => $technologiesAll,
+            'technologySelectedIds' => $technologySelectedIds,
+        ]);
     }
 
     public function update(Request $request, Project $project)
@@ -107,8 +138,16 @@ class ProjectsController extends Controller
                 'short_description' => $validated['short_description'],
                 'long_description' => $validated['long_description'],
                 'link' => $validated['link'],
-                'github' => $validated['github']
+                'github' => $validated['github'],
+                'technology_ids' => ['array'],
+                'technology_ids.*' => ['integer', 'exists:technologies,id'],
             ]);
+
+            $data = [];
+            foreach ($request->input('technology_ids', []) as $index => $techId) {
+                $data[$techId] = ['sort_order' => $index + 1];
+            }
+            $project->technologies()->sync($data);
 
             // Handle new image uploads if any
             if ($request->hasFile('images')) {

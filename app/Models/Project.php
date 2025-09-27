@@ -103,4 +103,12 @@ class Project extends Model
             $this->files()->updateExistingPivot($fileId, ['sort_order' => $index + 1]);
         }
     }
+
+    public function technologies()
+    {
+        return $this->belongsToMany(Technology::class)
+            ->withPivot(['sort_order'])
+            ->withTimestamps()
+            ->orderBy('sort_order');
+    }
 }

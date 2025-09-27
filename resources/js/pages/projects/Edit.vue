@@ -38,6 +38,18 @@
                         </div>
                     </div>
 
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Technologies</label>
+                        <TechnologyMultiSelect
+                            v-model="form.technology_ids"
+                            :options="technologiesAll"
+                            placeholder="Search technologies…"
+                        />
+                        <div v-if="form.errors.technology_ids" class="text-red-600 text-sm mt-1">
+                            {{ form.errors.technology_ids }}
+                        </div>
+                    </div>
+
                     <div class="flex flex-col md:col-span-3">
                         <Label for="long_description" class="mb-1 text-gray-900 dark:text-gray-100">Long Description</Label>
                         <RichTextEditor
@@ -316,6 +328,7 @@ import { Label } from '@/components/ui/label';
 import { computed, ref, watch } from 'vue';
 import { router } from '@inertiajs/vue3'
 import FileUploader from '@/components/FileUploader.vue';
+import TechnologyMultiSelect, { type TechnologyOption } from '@/components/ui/technology-multi-select/TechnologyMultiSelect.vue';
 
 interface Project {
     id: number,
@@ -327,7 +340,12 @@ interface Project {
     'images': array,
 }
 
-const props = defineProps<{ project: Project}>();
+const props = defineProps<{
+    project: Project,
+    technologiesAll: TechnologyOption[],
+    technologySelectedIds?: number[]
+}>();
+
 const form = useForm({
     name: props.project.name,
     short_description: props.project.short_description,
@@ -335,8 +353,9 @@ const form = useForm({
     link: props.project.link,
     github: props.project.github,
     images: [] as File[],
+    technology_ids: Array.from(props.technologySelectedIds ?? []),
 })
-
+console.log(props.technologySelectedIds);
 const reorderMode = ref(false)
 const reorderingImages = ref(false)
 const orderedImages = ref([...props.project.files])
