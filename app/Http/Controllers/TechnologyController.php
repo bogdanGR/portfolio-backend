@@ -33,15 +33,15 @@ class TechnologyController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, Technology $technology)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'slug' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:technologies',
+            'slug' => 'required|string|max:255|unique:technologies',
             'category' => ['required' , 'string', Rule::enum(TechnologyCategory::class)],
         ]);
 
-        Technology::create($validated);
+        $technology->create($validated);
 
         return redirect()->route('technologies.index')
             ->with('success', 'Skill created successfully!');
@@ -58,17 +58,35 @@ class TechnologyController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Technology $technology)
     {
-        //
+        $categories = TechnologyCategory::all();
+
+        return Inertia::render('technologies/Edit', [
+            'technology' => $technology,
+            'categories' => $categories
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Technology $technology)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'slug' => 'required|string|max:255',
+            'category' => ['required' , 'string', Rule::enum(TechnologyCategory::class)],
+        ]);
+
+        if ($validated) {
+            $technology->update($validated);
+
+            return redirect()->route('technologies.index')
+                ->with('success', 'Skill updated successfully!');
+        } else {
+            return redirect()->back()-with('error', 'Skill not updated!');
+        }
     }
 
     /**

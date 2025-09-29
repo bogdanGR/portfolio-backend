@@ -43,7 +43,7 @@
                         <Label for="slug" class="mb-1 text-gray-900 dark:text-gray-100">Category</Label>
                         <category-select :categories="props.categories"  v-model="form.category" />
                         <div v-if="form.errors.slug" class="mt-1 text-sm text-red-600 dark:text-red-400">
-                            {{ form.errors.category }}
+                            {{ form.errors.slug }}
                         </div>
                     </div>
                 </div>
@@ -64,19 +64,33 @@ import categorySelect from  '@/components/technologies/categorySelect.vue';
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Skill Create', href: '/technologies' }];
 
-const form = useForm({
-    name: '',
-    slug: '',
-    category: '',
-});
+interface Technology {
+    id: number,
+    name: string,
+    slug: string,
+    category: string,
+}
 
 const props = defineProps<{
     categories?: string[],
+    technology: Technology,
 }>();
 
+
+const form = useForm({
+    name: props.technology.name,
+    slug: props.technology.slug,
+    category: props.technology.category,
+});
+
 function submit() {
-    form.post(route('technologies.store'), {
-        forceFormData: true
-    });
+    console.log(form);
+    form.transform(data => ({
+        ...data,
+        _method: 'put',
+    })).post(route('technologies.update', { technology: props.technology.id }), {
+        forceFormData: true,
+        preserveScroll: true,
+    })
 }
 </script>
