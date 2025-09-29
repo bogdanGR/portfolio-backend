@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\TechnologyCategory;
 use App\Models\Technology;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class TechnologyController extends Controller
@@ -23,7 +25,9 @@ class TechnologyController extends Controller
      */
     public function create()
     {
-        //
+        $categories = TechnologyCategory::all();
+
+        return Inertia::render('technologies/Create', compact('categories'));
     }
 
     /**
@@ -31,7 +35,16 @@ class TechnologyController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'slug' => 'required|string|max:255',
+            'category' => ['required' , 'string', Rule::enum(TechnologyCategory::class)],
+        ]);
+
+        Technology::create($validated);
+
+        return redirect()->route('technologies.index')
+            ->with('success', 'Skill created successfully!');
     }
 
     /**
