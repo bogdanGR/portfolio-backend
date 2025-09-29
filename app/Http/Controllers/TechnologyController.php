@@ -44,7 +44,7 @@ class TechnologyController extends Controller
         $technology->create($validated);
 
         return redirect()->route('technologies.index')
-            ->with('success', 'Skill created successfully!');
+            ->with('message', 'Skill created successfully!');
     }
 
     /**
@@ -83,9 +83,9 @@ class TechnologyController extends Controller
             $technology->update($validated);
 
             return redirect()->route('technologies.index')
-                ->with('success', 'Skill updated successfully!');
+                ->with('message', 'Skill updated successfully!');
         } else {
-            return redirect()->back()-with('error', 'Skill not updated!');
+            return redirect()->back()-with('message', 'Skill not updated!');
         }
     }
 
@@ -96,9 +96,9 @@ class TechnologyController extends Controller
     {
         if ($technology->delete()) {
             return redirect()->route('technologies.index')
-                ->with('success', 'Skill deleted successfully!');
+                ->with('message', 'Skill deleted successfully!');
         }
         return back()
-            ->withErrors(['error' => 'Failed to delete the skill. Please try again.']);
+            ->withErrors(['message' => 'Failed to delete the skill. Please try again.']);
     }
 }

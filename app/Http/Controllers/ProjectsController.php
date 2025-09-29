@@ -77,13 +77,13 @@ class ProjectsController extends Controller
             DB::commit();
 
             return redirect()->route('projects.index')
-                ->with('success', 'Project created successfully!');
+                ->with('message', 'Project created successfully!');
 
         } catch (\Exception $e) {
             DB::rollBack();
 
             return back()
-                ->withErrors(['error' => 'Failed to create project. Please try again.'])
+                ->withErrors(['message' => 'Failed to create project. Please try again.'])
                 ->withInput();
         }
 
@@ -157,13 +157,13 @@ class ProjectsController extends Controller
             DB::commit();
 
             return redirect()->route('projects.index')
-                ->with('success', 'Project updated successfully!');
+                ->with('message', 'Project updated successfully!');
 
         } catch (\Exception $e) {
             DB::rollBack();
 
             return back()
-                ->withErrors(['error' => 'Failed to update project. Please try again.'])
+                ->withErrors(['message' => 'Failed to update project. Please try again.'])
                 ->withInput();
         }
     }
@@ -192,13 +192,13 @@ class ProjectsController extends Controller
             DB::commit();
 
             return redirect()->route('projects.index')
-                ->with('success', 'Project deleted successfully!');
+                ->with('message', 'Project deleted successfully!');
 
         } catch (\Exception $e) {
             DB::rollBack();
 
             return back()
-                ->withErrors(['error' => 'Failed to delete project. Please try again.']);
+                ->withErrors(['message' => 'Failed to delete project. Please try again.']);
         }
     }
 
