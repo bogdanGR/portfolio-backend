@@ -92,8 +92,13 @@ class TechnologyController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Technology $technology)
     {
-        //
+        if ($technology->delete()) {
+            return redirect()->route('technologies.index')
+                ->with('success', 'Skill deleted successfully!');
+        }
+        return back()
+            ->withErrors(['error' => 'Failed to delete the skill. Please try again.']);
     }
 }
