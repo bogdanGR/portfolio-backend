@@ -1,6 +1,6 @@
 <template>
     <Head title="Skill Create" />
-    <AppLayout :breadcrumbs="breadcrumbs">
+    <AppLayout :breadcrumbs="[{ title: 'Skill Edit', href: `/technologies/${props.technology.id}/edit` }]">
         <div class="container mx-auto p-4">
             <form @submit.prevent="submit" class="space-y-6">
                 <div class="grid items-start gap-6 md:grid-cols-3">
@@ -59,10 +59,7 @@ import { Head, useForm } from '@inertiajs/vue3';
 import Button from '../../components/ui/button/Button.vue';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import type { BreadcrumbItem } from '@/types';
 import categorySelect from  '@/components/technologies/categorySelect.vue';
-
-const breadcrumbs: BreadcrumbItem[] = [{ title: 'Skill Create', href: '/technologies' }];
 
 interface Technology {
     id: number,
@@ -84,7 +81,6 @@ const form = useForm({
 });
 
 function submit() {
-    console.log(form);
     form.transform(data => ({
         ...data,
         _method: 'put',
