@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProjectsController;
+use App\Http\Controllers\TechnologyController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -26,5 +27,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('projects/{project}/images/{fileId}/featured', [ProjectsController::class, 'setFeaturedImage'])->name('projects.setFeaturedImage');
     Route::post('projects/{project}/images/reorder', [ProjectsController::class, 'reorderImages'])->name('projects.reorderImages');
 });
+
+Route::resource('technologies', TechnologyController::class)->middleware(['auth', 'verified']);
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
