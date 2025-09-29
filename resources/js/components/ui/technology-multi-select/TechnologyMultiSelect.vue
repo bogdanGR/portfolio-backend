@@ -161,7 +161,6 @@ watch(open, (v) => { if (v) emit('focus') })
                 :placeholder="selectedIds.length ? '' : (placeholder ?? 'Select technologies…')"
                 :disabled="disabled"
                 class="flex-1 min-w-[8rem] bg-transparent outline-none text-sm py-0.5"
-                @focus="open = true"
             />
 
             <!-- Actions -->
