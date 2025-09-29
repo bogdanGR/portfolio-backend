@@ -1,5 +1,5 @@
 <template>
-    <Head title="Projects" />
+    <Head title="Skills" />
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="p-4">
             <div v-if="page.props.flash?.message" class="alert">
