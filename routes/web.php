@@ -22,7 +22,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/projects/{project}', [ProjectsController::class, 'update'])->name('projects.update');
     Route::delete('/projects/{project}', [ProjectsController::class, 'destroy'])->name('projects.destroy');
 
-    Route::post('projects/{project}/images', [ProjectsController::class, 'uploadImages'])->name('projects.uploadImages');
     Route::delete('projects/{project}/images/{fileId}', [ProjectsController::class, 'detachImage'])->name('projects.detachImage');
     Route::post('projects/{project}/images/{fileId}/featured', [ProjectsController::class, 'setFeaturedImage'])->name('projects.setFeaturedImage');
     Route::post('projects/{project}/images/reorder', [ProjectsController::class, 'reorderImages'])->name('projects.reorderImages');

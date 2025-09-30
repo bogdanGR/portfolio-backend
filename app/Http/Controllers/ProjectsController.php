@@ -2,290 +2,130 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\DeleteProjectAction;
+use App\Http\Requests\Projects\StoreProjectRequest;
+use App\Http\Requests\Projects\UpdateProjectRequest;
 use App\Models\Project;
-use App\Models\File;
 use App\Models\Technology;
+use App\Repositories\ProjectRepository;
+use App\Services\ProjectService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Inertia\Inertia;
+
 class ProjectsController extends Controller
 {
+    /**
+     * Inject project service and project repository
+     * @param ProjectService $projectService
+     * @param ProjectRepository $projectRepository
+     */
+    public function __construct(
+        private readonly ProjectService $projectService,
+        private readonly ProjectRepository $projectRepository
+    ){}
+
     public function index()
     {
-        $projects = Project::with([
-            'files' => function ($query) {
-                $query->orderBy('project_files.sort_order');
-            },
-            'technologies' => function ($query) {
-                $query->orderBy('project_technology.sort_order');
-            }
-        ])->get();
-
+        $projects = $this->projectRepository->getAllWithRelations();
         return Inertia::render('projects/Index', compact('projects'));
     }
 
     public function create()
     {
         $technologies = Technology::all();
-        return Inertia::render('projects/Create', ['technologies' => $technologies]);
+        return Inertia::render('projects/Create', compact('technologies'));
     }
 
-    public function store(Request $request)
+    public function store(StoreProjectRequest $request)
     {
-        \Log::info('Files received:', [
-            'images_count' => $request->hasFile('images') ? count($request->file('images')) : 0,
-            'all_files' => $request->allFiles()
-        ]);
-
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'short_description' => 'required|string|max:255',
-            'long_description' => 'required|string',
-            'link' => 'nullable|url',
-            'github' => 'nullable|url',
-            'images' => 'nullable|array',
-            'images.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'technology_ids' => ['array'],
-            'technology_ids.*' => ['integer', 'exists:technologies,id'],
-            ]);
-
-        DB::beginTransaction();
         try {
-            // Create the project
-            $project = Project::create([
-                'name' => $validated['name'],
-                'short_description' => $validated['short_description'],
-                'long_description' => $validated['long_description'],
-                'link' => $validated['link'],
-                'github' => $validated['github']
-            ]);
+            $this->projectService->createProject(
+                $request->validated(),
+                $request->file('images')
+            );
 
-            // Handle file uploads
-            if ($request->hasFile('images')) {
-                $this->handleImageUploads($project, $request->file('images'));
-            }
-
-            $data = [];
-            foreach ($request->input('technology_ids', []) as $index => $techId) {
-                $data[$techId] = ['sort_order' => $index + 1];
-            }
-            $project->technologies()->sync($data);
-
-            DB::commit();
-
-            return redirect()->route('projects.index')
+            return redirect()
+                ->route('projects.index')
                 ->with('message', 'Project created successfully!');
-
         } catch (\Exception $e) {
-            DB::rollBack();
-
             return back()
-                ->withErrors(['message' => 'Failed to create project. Please try again.'])
+                ->withErrors(['message' => 'Failed to create project.'])
                 ->withInput();
         }
-
-        // return redirect()->route('projects.index')->with('message', 'Project created successfully.');
     }
 
     public function edit(Project $project)
     {
-        $project->load([
-            'technologies:id,name', // for selected ids
-            'files' => fn ($q) => $q->orderBy('project_files.sort_order'),
-        ]);
-
-        // 1) All options for the multiselect
-        $technologiesAll = Technology::select('id','name','slug','category')
-            ->orderBy('name')
-            ->get();
-
-        // 2) Selected IDs for this project (plain array)
-        $technologySelectedIds = $project->technologies
-            ->pluck('id')
-            ->values()
-            ->all();
-
-        return Inertia::render('projects/Edit', [
-            'project' => $project,
-            'technologiesAll' => $technologiesAll,
-            'technologySelectedIds' => $technologySelectedIds,
-        ]);
+        $data = $this->projectRepository->getEditData($project);
+        return Inertia::render('projects/Edit', $data);
     }
 
-    public function update(Request $request, Project $project)
+    public function update(UpdateProjectRequest $request, Project $project)
     {
-
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'short_description' => 'required|string|max:255',
-            'long_description' => 'required|string',
-            'link' => 'nullable|url',
-            'github' => 'nullable|url',
-            'images' => 'nullable|array',
-            //'images.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:2048'
-        ]);
-
-        //var_dump($validated);die();
-       // dd('update');
-        DB::beginTransaction();
         try {
-            // Update project details
-            $project->update([
-                'name' => $validated['name'],
-                'short_description' => $validated['short_description'],
-                'long_description' => $validated['long_description'],
-                'link' => $validated['link'],
-                'github' => $validated['github'],
-                'technology_ids' => ['array'],
-                'technology_ids.*' => ['integer', 'exists:technologies,id'],
-            ]);
+            $this->projectService->updateProject(
+                $project,
+                $request->validated(),
+                $request->file('images')
+            );
 
-            $data = [];
-            foreach ($request->input('technology_ids', []) as $index => $techId) {
-                $data[$techId] = ['sort_order' => $index + 1];
-            }
-            $project->technologies()->sync($data);
-
-            // Handle new image uploads if any
-            if ($request->hasFile('images')) {
-                $this->handleImageUploads($project, $request->file('images'));
-            }
-
-            DB::commit();
-
-            return redirect()->route('projects.index')
+            return redirect()
+                ->route('projects.index')
                 ->with('message', 'Project updated successfully!');
-
         } catch (\Exception $e) {
-            DB::rollBack();
-
             return back()
                 ->withErrors(['message' => 'Failed to update project. Please try again.'])
                 ->withInput();
         }
     }
 
-    public function destroy(Project $project)
+    public function destroy(Project $project, DeleteProjectAction $action)
     {
-        DB::beginTransaction();
         try {
-            // Get all files before deleting the project
-            $files = $project->files;
-
-            // Delete the project (this will cascade delete pivot records)
-            $project->delete();
-
-            // Clean up orphaned files
-            foreach ($files as $file) {
-                // Check if file is used by other projects or models
-                if ($file->projects()->count() === 0) {
-                    // Delete file from storage
-                    Storage::delete($file->path);
-                    // Delete file record
-                    $file->delete();
-                }
-            }
-
-            DB::commit();
-
-            return redirect()->route('projects.index')
+            $action->execute($project);
+            return redirect()
+                ->route('projects.index')
                 ->with('message', 'Project deleted successfully!');
-
         } catch (\Exception $e) {
-            DB::rollBack();
-
-            return back()
-                ->withErrors(['message' => 'Failed to delete project. Please try again.']);
+            return back()->withErrors(['message' => 'Failed to delete project.']);
         }
-    }
-
-    /**
-     * Handle uploading multiple images for a project
-     */
-    private function handleImageUploads(Project $project, array $uploadedFiles)
-    {
-        $maxSortOrder = $project->files()->max('project_files.sort_order') ?? 0;
-        $isFirstImage = $project->files()->count() === 0;
-
-        foreach ($uploadedFiles as $index => $uploadedFile) {
-            // Generate unique filename
-            $filename = Str::uuid() . '.' . $uploadedFile->getClientOriginalExtension();
-            $directory = 'projects/' . $project->id;
-
-            // Store the file
-            $path = $uploadedFile->storeAs($directory, $filename, 'public');
-
-            // Create file record
-            $file = File::create([
-                'original_name' => $uploadedFile->getClientOriginalName(),
-                'filename' => $filename,
-                'path' => $path,
-                'mime_type' => $uploadedFile->getMimeType(),
-                'size' => $uploadedFile->getSize(),
-                'type' => 'image'
-            ]);
-
-            // Attach file to project
-            $project->files()->attach($file->id, [
-                'sort_order' => $maxSortOrder + $index + 1,
-                'is_featured' => $isFirstImage && $index === 0, // First image of first batch is featured
-                'created_at' => now(),
-                'updated_at' => now()
-            ]);
-        }
-    }
-
-    public function uploadImages(Request $request, Project $project)
-    {
-        dd('upload images...');
-        $validator = Validator::make($request->all(), [
-            'images' => 'required|array',
-            'images.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:2048'
-        ]);
-
-        dd('edw');
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        $uploadedFiles = $project->uploadFiles($request->file('images'));
-
-        return response()->json([
-            'files' => $uploadedFiles,
-            'project' => $project->fresh(['files'])
-        ]);
     }
 
     public function detachImage(Project $project, $fileId)
     {
-        $project->removeFile($fileId);
-        $project->detachFile($fileId);
+        try {
+            $this->projectService->detachImage($project, $fileId);
 
-        redirect()->back();
+            return back()->with('message', 'Image removed successfully!');
+        } catch (\Exception $e) {
+            return back()->withErrors(['message' => 'Failed to remove image.']);
+        }
     }
 
     public function setFeaturedImage(Project $project, $fileId)
     {
-        $project->setFeaturedImage($fileId);
-        redirect()->back()->with('message', 'Featured image updated successfully!');
+        try {
+            $this->projectService->setFeaturedImage($project, $fileId);
+
+            return back()->with('message', 'Featured image updated successfully!');
+        } catch (\Exception $e) {
+            return back()->withErrors(['message' => 'Failed to update featured image.']);
+        }
     }
 
     public function reorderImages(Request $request, Project $project)
     {
-        $validator = Validator::make($request->all(), [
+        $validated = $request->validate([
             'file_ids' => 'required|array',
             'file_ids.*' => 'integer'
         ]);
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+        try {
+            $this->projectService->reorderImages($project, $validated['file_ids']);
+
+            return back()->with('message', 'Images reordered successfully!');
+        } catch (\Exception $e) {
+            return back()->withErrors(['message' => 'Failed to reorder images.']);
         }
-
-        $project->reorderFiles($request->file_ids);
-
-        redirect()->back()->with('message', 'Images updated successfully!');
     }
 }
