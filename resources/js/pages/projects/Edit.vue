@@ -23,7 +23,8 @@
 
                     <!-- Short Description -->
                     <div class="flex flex-col">
-                        <Label for="short_description" class="mb-1 text-gray-900 dark:text-gray-100">Short Description</Label>
+                        <Label for="short_description" class="mb-1 text-gray-900 dark:text-gray-100">Short
+                            Description</Label>
                         <Input
                             v-model="form.short_description"
                             id="short_description"
@@ -51,7 +52,8 @@
                     </div>
 
                     <div class="flex flex-col md:col-span-3">
-                        <Label for="long_description" class="mb-1 text-gray-900 dark:text-gray-100">Long Description</Label>
+                        <Label for="long_description" class="mb-1 text-gray-900 dark:text-gray-100">Long
+                            Description</Label>
                         <RichTextEditor
                             v-model="form.long_description"
                             class="rounded-md border border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-900"
@@ -95,16 +97,16 @@
                         </div>
                     </div>
                     <!-- Existing images-->
-                    <div v-if="project.files && project.files.length > 0" class="bg-white rounded-lg border border-gray-200 p-6 dark:bg-gray-800 dark:border-gray-700">
+                    <div v-if="project.files && project.files.length > 0"
+                         class="bg-white rounded-lg border border-gray-200 p-6 dark:bg-gray-800 dark:border-gray-700">
                         <div class="flex justify-between items-center mb-4">
                             <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Current Images</h2>
                             <button
                                 type="button"
                                 @click="toggleReorderMode"
                                 class="px-3 py-1 text-sm rounded-md transition-colors duration-200"
-                                :class="reorderMode ?
-                'bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-800 dark:text-green-100 dark:hover:bg-green-700' :
-                'bg-indigo-100 text-indigo-800 hover:bg-indigo-200 dark:bg-indigo-800 dark:text-indigo-100 dark:hover:bg-indigo-700'"
+                                :class="reorderMode ? 'bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-800 dark:text-green-100 dark:hover:bg-green-700'
+                                        :'bg-indigo-100 text-indigo-800 hover:bg-indigo-200 dark:bg-indigo-800 dark:text-indigo-100 dark:hover:bg-indigo-700'"
                             >
                                 {{ reorderMode ? 'Save Order' : 'Reorder Images' }}
                             </button>
@@ -121,12 +123,12 @@
                                 :key="image.id"
                                 class="relative group aspect-square bg-gray-100 rounded-lg overflow-hidden dark:bg-gray-700 transition-all duration-200"
                                 :class="{
-                'ring-2 ring-yellow-400': image.pivot?.is_featured,
-                'cursor-move': reorderMode,
-                'ring-2 ring-indigo-500': reorderMode,
-                'transform scale-95 opacity-75': draggedIndex === index,
-                'transform scale-105': reorderMode && hoveredIndex === index && draggedIndex !== null && draggedIndex !== index
-            }"
+                                    'ring-2 ring-yellow-400': image.pivot?.is_featured,
+                                    'cursor-move': reorderMode,
+                                    'ring-2 ring-indigo-500': reorderMode,
+                                    'transform scale-95 opacity-75': draggedIndex === index,
+                                    'transform scale-105': reorderMode && hoveredIndex === index && draggedIndex !== null && draggedIndex !== index
+                                }"
                                 :draggable="reorderMode"
                                 @dragstart="onDragStart($event, index)"
                                 @dragover="onDragOver($event, index)"
@@ -144,7 +146,8 @@
                                 <!-- Featured badge -->
                                 <div v-if="image.pivot?.is_featured" class="absolute top-2 left-2 bg-yellow-400 text-yellow-900 text-xs px-2 py-1 rounded-full font-medium flex items-center space-x-1">
                                     <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                        <path
+                                            d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                                     </svg>
                                     <span>Featured</span>
                                 </div>
@@ -165,7 +168,8 @@
                                         title="Set as featured"
                                     >
                                         <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                            <path
+                                                d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                                         </svg>
                                     </button>
 
@@ -178,7 +182,8 @@
                                         :disabled="removingImages.includes(image.id)"
                                     >
                                         <svg v-if="removingImages.includes(image.id)" class="animate-spin w-3 h-3" fill="none" viewBox="0 0 24 24">
-                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                                    stroke-width="4"></circle>
                                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                         </svg>
                                         <svg v-else class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
@@ -188,7 +193,8 @@
                                 </div>
 
                                 <!-- File name -->
-                                <div class="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-xs p-2 truncate">
+                                <div
+                                    class="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-xs p-2 truncate">
                                     {{ image.original_name }}
                                 </div>
                             </div>
@@ -197,7 +203,8 @@
                         <!-- Loading indicator for reordering -->
                         <div v-if="reorderingImages" class="mt-4 flex items-center justify-center text-sm text-gray-600 dark:text-gray-400">
                             <svg class="animate-spin w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                        stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                             </svg>
                             Saving new order...
@@ -226,14 +233,11 @@
                         :image-resize-width="800"
                         :image-resize-height="600"
                         image-resize-mode="contain"
-                        @files-changed="onImagesChanged"
-                        @upload-complete="onUploadComplete"
-                        @upload-error="onUploadError"
-                        @featured-changed="onFeaturedChanged"
                         @file-click="onImageClick"
                         @uploading-change="onUploadingChange"
                     >
-                        <template #file-preview="{ files, reorderMode, removeFile, setFeatured, onDragStart, onDragOver, onDrop, showFeatured }">
+                        <template
+                            #file-preview="{ files, reorderMode, removeFile, setFeatured, onDragStart, onDragOver, onDrop, showFeatured }">
                             <div
                                 class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4"
                                 :class="{ 'cursor-move': reorderMode }"
@@ -264,7 +268,8 @@
                                     <!-- Featured badge -->
                                     <div v-if="showFeatured && index === 0" class="absolute top-2 left-2 bg-yellow-400 text-yellow-900 text-xs px-2 py-1 rounded-full font-medium flex items-center space-x-1">
                                         <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                            <path
+                                                d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                                         </svg>
                                         <span>Featured</span>
                                     </div>
@@ -284,7 +289,8 @@
                                             title="Set as featured"
                                         >
                                             <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                                <path
+                                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                                             </svg>
                                         </button>
 
@@ -301,7 +307,8 @@
                                     </div>
 
                                     <!-- File name -->
-                                    <div class="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-xs p-2 truncate">
+                                    <div
+                                        class="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-xs p-2 truncate">
                                         {{ image.name }}
                                     </div>
                                 </div>
@@ -319,16 +326,18 @@
 </template>
 
 <script setup lang="ts">
-import Button from '@/components/ui/button/Button.vue'
-import AppLayout from '@/layouts/AppLayout.vue'
-import { Head, useForm } from '@inertiajs/vue3'
-import RichTextEditor from '@/components/RichTextEditor.vue'
+import Button from '@/components/ui/button/Button.vue';
+import AppLayout from '@/layouts/AppLayout.vue';
+import { Head, useForm } from '@inertiajs/vue3';
+import RichTextEditor from '@/components/RichTextEditor.vue';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { computed, ref, watch } from 'vue';
-import { router } from '@inertiajs/vue3'
+import { ref, watch } from 'vue';
+import { router } from '@inertiajs/vue3';
 import FileUploader from '@/components/FileUploader.vue';
-import TechnologyMultiSelect, { type TechnologyOption } from '@/components/ui/technology-multi-select/TechnologyMultiSelect.vue';
+import TechnologyMultiSelect, {
+    type TechnologyOption
+} from '@/components/ui/technology-multi-select/TechnologyMultiSelect.vue';
 
 interface Project {
     id: number,
@@ -353,35 +362,36 @@ const form = useForm({
     link: props.project.link,
     github: props.project.github,
     images: [] as File[],
-    technology_ids: Array.from(props.technologySelectedIds ?? []),
-})
-console.log(props.technologySelectedIds);
-const reorderMode = ref(false)
-const reorderingImages = ref(false)
-const orderedImages = ref([...props.project.files])
-const draggedIndex = ref<number | null>(null)
-const hoveredIndex = ref<number | null>(null)
-const isUploading = ref(false)
+    technology_ids: Array.from(props.technologySelectedIds ?? [])
+});
 
-const removingImages = ref<number[]>([])
+const reorderMode = ref(false);
+const reorderingImages = ref(false);
+const orderedImages = ref([...props.project.files]);
+const draggedIndex = ref<number | null>(null);
+const hoveredIndex = ref<number | null>(null);
+const isUploading = ref(false);
+
+const removingImages = ref<number[]>([]);
+
 function removeExistingImage(imageId: number) {
-    if(confirm('Are you sure you want to delete this image?')) {
-        if (removingImages.value.includes(imageId)) return
-        removingImages.value.push(imageId)
+    if (confirm('Are you sure you want to delete this image?')) {
+        if (removingImages.value.includes(imageId)) return;
+        removingImages.value.push(imageId);
 
         try {
             router.delete(
                 route('projects.detachImage', {
                     project: props.project.id,
-                    fileId: imageId,
+                    fileId: imageId
                 }),
                 {
-                    preserveScroll: true,
+                    preserveScroll: true
                 }
-            )
+            );
         } finally {
             // remove loading state
-            removingImages.value = removingImages.value.filter(id => id !== imageId)
+            removingImages.value = removingImages.value.filter(id => id !== imageId);
         }
     }
 }
@@ -392,18 +402,18 @@ function setFeaturedExistingImage(imageId: number) {
         router.post(
             route('projects.setFeaturedImage', {
                 project: props.project.id,
-                fileId: imageId,
+                fileId: imageId
             }),
             {},
             { preserveScroll: true }
-        )
+        );
     } catch (e) {
-        console.error(e)
+        console.error(e);
     }
 }
 
 function onUploadingChange(busy: boolean) {
-    isUploading.value = busy
+    isUploading.value = busy;
 }
 
 function submit() {
@@ -413,120 +423,100 @@ function submit() {
 
     form.transform(data => ({
         ...data,
-        _method: 'put',
+        _method: 'put'
     })).post(route('projects.update', { project: props.project.id }), {
         forceFormData: true,      // ensures multipart/form-data
-        preserveScroll: true,
-    })
+        preserveScroll: true
+    });
 }
+const onImageClick = (image: any, index: number) => {};
 
-
-// Event handlers
-const onImagesChanged = (images: any[]) => {
-    console.log('Images changed:', images);
-};
-
-const onUploadComplete = (files: any[]) => {
-    console.log('Upload complete:', files);
-};
-
-const onUploadError = (error: string) => {
-    console.error('Upload error:', error);
-};
-
-const onFeaturedChanged = (index: number) => {
-    console.log('Featured image changed to index:', index);
-};
-
-const onImageClick = (image: any, index: number) => {
-    console.log('Image clicked:', image, index);
-};
 // Update orderedImages when project files change
 watch(() => props.project.files, (newFiles) => {
-    orderedImages.value = [...newFiles]
-}, { deep: true })
+    orderedImages.value = [...newFiles];
+}, { deep: true });
 
 // Toggle reorder mode
 function toggleReorderMode() {
     if (reorderMode.value) {
         // Save the new order
-        saveImageOrder()
+        saveImageOrder();
     } else {
         // Enter reorder mode
-        reorderMode.value = true
+        reorderMode.value = true;
     }
 }
 
 // Drag and drop handlers
 function onDragStart(event: DragEvent, index: number) {
-    if (!reorderMode.value) return
+    if (!reorderMode.value) return;
 
-    draggedIndex.value = index
-    event.dataTransfer!.effectAllowed = 'move'
-    event.dataTransfer!.setData('text/html', index.toString())
+    draggedIndex.value = index;
+    event.dataTransfer!.effectAllowed = 'move';
+    event.dataTransfer!.setData('text/html', index.toString());
 
     // Add some visual feedback
     if (event.target instanceof HTMLElement) {
-        event.target.style.opacity = '0.5'
+        event.target.style.opacity = '0.5';
     }
 }
 
 function onDragOver(event: DragEvent, index: number) {
-    if (!reorderMode.value || draggedIndex.value === null) return
+    if (!reorderMode.value || draggedIndex.value === null) return;
 
-    event.preventDefault()
-    event.dataTransfer!.dropEffect = 'move'
+    event.preventDefault();
+    event.dataTransfer!.dropEffect = 'move';
 }
 
 function onDragEnter(index: number) {
-    if (!reorderMode.value || draggedIndex.value === null) return
-    hoveredIndex.value = index
+    if (!reorderMode.value || draggedIndex.value === null) return;
+    hoveredIndex.value = index;
 }
 
 function onDragLeave() {
-    hoveredIndex.value = null
+    hoveredIndex.value = null;
 }
 
 function onDrop(event: DragEvent, dropIndex: number) {
-    if (!reorderMode.value || draggedIndex.value === null) return
+    if (!reorderMode.value || draggedIndex.value === null) return;
 
-    event.preventDefault()
+    event.preventDefault();
 
-    const dragIndex = draggedIndex.value
+    const dragIndex = draggedIndex.value;
 
     if (dragIndex !== dropIndex) {
         // Create new array with reordered items
-        const newOrderedImages = [...orderedImages.value]
-        const draggedItem = newOrderedImages[dragIndex]
+        const newOrderedImages = [...orderedImages.value];
+        const draggedItem = newOrderedImages[dragIndex];
 
         // Remove the dragged item
-        newOrderedImages.splice(dragIndex, 1)
+        newOrderedImages.splice(dragIndex, 1);
 
         // Insert it at the new position
-        newOrderedImages.splice(dropIndex, 0, draggedItem)
+        newOrderedImages.splice(dropIndex, 0, draggedItem);
 
-        orderedImages.value = newOrderedImages
+        orderedImages.value = newOrderedImages;
     }
 
     // Reset drag state
-    draggedIndex.value = null
-    hoveredIndex.value = null
+    draggedIndex.value = null;
+    hoveredIndex.value = null;
 
     // Reset visual feedback
     if (event.target instanceof HTMLElement) {
-        const draggedElement = document.querySelector('[style*="opacity: 0.5"]') as HTMLElement
+        const draggedElement = document.querySelector('[style*="opacity: 0.5"]') as HTMLElement;
         if (draggedElement) {
-            draggedElement.style.opacity = ''
+            draggedElement.style.opacity = '';
         }
     }
 }
 
 // Save the new image order
 async function saveImageOrder() {
-    reorderingImages.value = true
+    reorderingImages.value = true;
 
     try {
-        const fileIds = orderedImages.value.map(image => image.id)
+        const fileIds = orderedImages.value.map(image => image.id);
 
         await router.post(
             route('projects.reorderImages', { project: props.project.id }),
@@ -534,23 +524,23 @@ async function saveImageOrder() {
             {
                 preserveScroll: true,
                 onSuccess: () => {
-                    reorderMode.value = false
+                    reorderMode.value = false;
                     // Update the project files with the new order
-                    props.project.files = [...orderedImages.value]
+                    props.project.files = [...orderedImages.value];
                 },
                 onError: (errors) => {
-                    console.error('Failed to reorder images:', errors)
+                    console.error('Failed to reorder images:', errors);
                     // Reset to original order on error
-                    orderedImages.value = [...props.project.files]
+                    orderedImages.value = [...props.project.files];
                 }
             }
-        )
+        );
     } catch (error) {
-        console.error('Error reordering images:', error)
+        console.error('Error reordering images:', error);
         // Reset to original order on error
-        orderedImages.value = [...props.project.files]
+        orderedImages.value = [...props.project.files];
     } finally {
-        reorderingImages.value = false
+        reorderingImages.value = false;
     }
 }
 </script>

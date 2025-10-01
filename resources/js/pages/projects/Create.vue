@@ -39,10 +39,10 @@
                         </div>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium mb-1">Technologies</label>
+                        <Label class="mb-1 text-gray-900 dark:text-gray-100">Technologies</Label>
                         <TechnologyMultiSelect
                             v-model="form.technology_ids"
-                            :options="technologies"
+                            :options="props.technologies"
                             placeholder="Search technologies…"
                         />
                         <div v-if="form.errors.technology_ids" class="text-red-600 text-sm mt-1">
@@ -115,10 +115,6 @@
                         :image-resize-width="800"
                         :image-resize-height="600"
                         image-resize-mode="contain"
-                        @files-changed="onImagesChanged"
-                        @upload-complete="onUploadComplete"
-                        @upload-error="onUploadError"
-                        @featured-changed="onFeaturedChanged"
                         @file-click="onImageClick"
                         @uploading-change="onUploadingChange"
                     >
@@ -209,7 +205,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 import Button from '@/components/ui/button/Button.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
@@ -220,7 +216,6 @@ import { Label } from '@/components/ui/label';
 import FileUploader from '@/components/FileUploader.vue';
 import TechnologyMultiSelect, { type TechnologyOption } from '@/components/ui/technology-multi-select/TechnologyMultiSelect.vue';
 
-// Component setup
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Project Create', href: '/projects' }];
 
 const props = defineProps<{
@@ -243,26 +238,7 @@ function onUploadingChange(busy: boolean) {
     isUploading.value = busy
 }
 
-// Event handlers
-const onImagesChanged = (images: any[]) => {
-    console.log('Images changed:', images);
-};
-
-const onUploadComplete = (files: any[]) => {
-    console.log('Upload complete:', files);
-};
-
-const onUploadError = (error: string) => {
-    console.error('Upload error:', error);
-};
-
-const onFeaturedChanged = (index: number) => {
-    console.log('Featured image changed to index:', index);
-};
-
-const onImageClick = (image: any, index: number) => {
-    console.log('Image clicked:', image, index);
-};
+const onImageClick = (image: any, index: number) => {};
 
 function submit() {
     if (isUploading.value) {

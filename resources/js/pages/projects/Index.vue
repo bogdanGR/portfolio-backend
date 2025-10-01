@@ -24,7 +24,7 @@
                         <TableHead>Short Description</TableHead>
                         <TableHead>Website URL</TableHead>
                         <TableHead>Github URL</TableHead>
-                        <TableHead>Action</TableHead>
+                        <TableHead>Actions</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -38,7 +38,7 @@
                         <TableCell>
                             <a v-if="project.github" :href="project.github" target="_blank">Github projects' link</a>
                         </TableCell>
-                        <TableCell class="text-center space-x-2">
+                        <TableCell class="space-x-2">
                             <Link :href="route('projects.edit', {id: project.id})">
                                 <Button>Edit</Button>
                             </Link>

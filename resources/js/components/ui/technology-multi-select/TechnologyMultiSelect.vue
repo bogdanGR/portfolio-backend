@@ -137,7 +137,7 @@ watch(open, (v) => { if (v) emit('focus') })
             <!-- Chips -->
             <template v-if="selectedIds.length">
         <span
-            v-for="id in selectedIds"
+            v-for="(id, idx) in selectedIds.slice(0, 3)"
             :key="id"
             class="inline-flex items-center gap-1 text-sm rounded-md px-2 py-0.5 bg-gray-100 dark:bg-gray-800"
             @click.stop
@@ -152,15 +152,22 @@ watch(open, (v) => { if (v) emit('focus') })
             ×
           </button>
         </span>
+                <span
+                    v-if="selectedIds.length > 3"
+                    class="inline-flex items-center text-sm px-2 py-0.5 text-gray-500 dark:text-gray-400"
+                >
+          +{{ selectedIds.length - 3 }} more...
+        </span>
             </template>
 
             <!-- Input / Placeholder -->
             <input
                 ref="inputRef"
                 v-model="search"
-                :placeholder="selectedIds.length ? '' : (placeholder ?? 'Select technologies…')"
+                :placeholder="selectedIds.length ? '' : (placeholder ?? 'Search…')"
                 :disabled="disabled"
-                class="flex-1 min-w-[8rem] bg-transparent outline-none text-sm py-0.5"
+                class="flex-1 min-w-0 bg-transparent outline-none text-sm py-0.5"
+                style="max-width: 120px;"
             />
 
             <!-- Actions -->
