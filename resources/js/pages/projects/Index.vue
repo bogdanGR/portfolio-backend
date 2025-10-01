@@ -18,7 +18,6 @@
             <Table>
                 <TableHeader>
                     <TableRow>
-                        <TableHead>ID</TableHead>
                         <TableHead>Name</TableHead>
                         <TableHead>Short Description</TableHead>
                         <TableHead>Skills</TableHead>
@@ -29,7 +28,6 @@
                 </TableHeader>
                 <TableBody>
                     <TableRow v-for="project in props.projects.data" :key="project.id">
-                        <TableCell>{{ project.id }}</TableCell>
                         <TableCell>{{ project.name }}</TableCell>
                         <TableCell>{{ project.short_description }}</TableCell>
                         <TableCell class="max-w-[280px]">
