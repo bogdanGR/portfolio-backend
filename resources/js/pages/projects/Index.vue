@@ -184,7 +184,6 @@ interface Project {
 
 interface Props {
     projects: Paginator<Project>;
-    // include any filters you keep in the query string (optional)
     filters?: Record<string, unknown>;
 }
 
