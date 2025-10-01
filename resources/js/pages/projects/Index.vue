@@ -14,7 +14,7 @@
             <Link :href="route('projects.create')">
                 <Button class="mb-4">Create a new project</Button>
             </Link>
-            <p class="mb-1 mb-2 font-bold">Total Projects: {{ props?.projects.length }}</p>
+            <p class="mb-1 mb-2 font-bold">Total Projects: {{ props.projects.total }}</p>
             <Table>
                 <TableHeader>
                     <TableRow>
@@ -28,7 +28,7 @@
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    <TableRow v-for="project in props.projects" :key="project.id">
+                    <TableRow v-for="project in props.projects.data" :key="project.id">
                         <TableCell>{{ project.id }}</TableCell>
                         <TableCell>{{ project.name }}</TableCell>
                         <TableCell>{{ project.short_description }}</TableCell>
@@ -100,11 +100,55 @@
                 </TableBody>
             </Table>
         </div>
+        <Pagination
+            v-slot="{ page }"
+            :items-per-page="props.projects.per_page"
+            :total="props.projects.total"
+            :default-page="props.projects.current_page"
+        >
+            <PaginationContent v-slot="{ items }">
+                <PaginationPrevious :disabled="props.projects.current_page <= 1" @click="goTo(props.projects.current_page - 1)" />
+
+                <!-- If your Pagination component provides an 'items' model -->
+                <template v-if="items?.length">
+                    <template v-for="(item, index) in items" :key="index">
+                        <PaginationItem
+                            v-if="item.type === 'page'"
+                            :value="item.value"
+                            :is-active="item.value === props.projects.current_page"
+                            @click="goTo(item.value)"
+                        >
+                            {{ item.value }}
+                        </PaginationItem>
+                    </template>
+
+                    <PaginationEllipsis v-if="items.some((i) => i.type === 'ellipsis')" />
+                </template>
+
+                <!-- Fallback: render 1..last_page -->
+                <template v-else>
+                    <PaginationItem
+                        v-for="n in props.projects.last_page"
+                        :key="n"
+                        :value="n"
+                        :is-active="n === props.projects.current_page"
+                        @click="goTo(n)"
+                    >
+                        {{ n }}
+                    </PaginationItem>
+                </template>
+
+                <PaginationNext :disabled="props.projects.current_page >= props.projects.last_page" @click="goTo(props.projects.current_page + 1)" />
+            </PaginationContent>
+        </Pagination>
     </AppLayout>
 </template>
+
 <script lang="ts" setup>
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import Button from '@/components/ui/button/Button.vue';
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
@@ -112,7 +156,17 @@ import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { Rocket } from 'lucide-vue-next';
 import { reactive } from 'vue';
 
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+// ----- Types -----
+type LinkType = { url: string | null; label: string; active: boolean };
+
+type Paginator<Item> = {
+    data: Item[];
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+    links: LinkType[];
+};
 
 interface Technology {
     id?: number;
@@ -123,30 +177,41 @@ interface Project {
     id: number;
     name: string;
     short_description: string;
+    link?: string | null;
+    github?: string | null;
     technologies?: (Technology | string)[];
 }
 
 interface Props {
-    projects: Project[];
+    projects: Paginator<Project>;
+    // include any filters you keep in the query string (optional)
+    filters?: Record<string, unknown>;
 }
 
-//get props from inerτia
+// ----- Props / page -----
 const props = defineProps<Props>();
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Projects',
-        href: '/projects',
-    },
-];
 const page = usePage();
 
+// ----- Breadcrumbs -----
+const breadcrumbs: BreadcrumbItem[] = [{ title: 'Projects', href: '/projects' }];
+
+// ----- Pagination navigation -----
+function goTo(page: number) {
+    router.get(
+        route('projects.index'),
+        { ...(props.filters ?? {}), page }, // keep filters, change page
+        { preserveScroll: true, preserveState: true, replace: true },
+    );
+}
+
+// ----- Technologies display helpers -----
 const VISIBLE_TECH_COUNT = 3;
 
 const getTechName = (t: Technology | string) => (typeof t === 'string' ? t : (t?.name ?? ''));
 
 const getTechKey = (t: Technology | string, idx: number) => (typeof t === 'string' ? `${t}-${idx}` : `${t?.id ?? idx}-${getTechName(t)}`);
 
-// Per-row popover open state + close timers
+// ----- Per-row popover open state + close timers -----
 const popoverOpen = reactive<Record<number, boolean>>({});
 const closeTimers = reactive<Record<number, number | undefined>>({});
 
@@ -165,6 +230,8 @@ const scheduleClose = (id: number, delay = 120) => {
         closeTimers[id] = undefined;
     }, delay);
 };
+
+// ----- Delete handler -----
 const handleDelete = (id: number) => {
     if (confirm('Are you sure you want to delete this project?')) {
         router.delete(route('projects.destroy', { id }));

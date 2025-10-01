@@ -4,10 +4,28 @@ namespace App\Repositories;
 
 use App\Models\Project;
 use App\Models\Technology;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 
 class ProjectRepository
 {
+    /**
+     * Return projects with pagination
+     * @param int $perPage
+     * @return LengthAwarePaginator
+     */
+    public function paginateWithRelations(int $perPage = 10): LengthAwarePaginator
+    {
+        return Project::query()
+            ->with([
+                'files' => fn ($q) => $q->orderBy('project_files.sort_order'),
+                'technologies' => fn ($q) => $q->orderBy('project_technology.sort_order'),
+            ])
+            ->orderByDesc('created_at')
+            ->paginate($perPage)
+            ->withQueryString();
+    }
+
     /**
      * Get all projects with related data
      * @return Collection

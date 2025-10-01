@@ -24,10 +24,14 @@ class ProjectsController extends Controller
         private readonly ProjectRepository $projectRepository
     ){}
 
-    public function index()
+    public function index(Request $request)
     {
-        $projects = $this->projectRepository->getAllWithRelations();
-        return Inertia::render('projects/Index', compact('projects'));
+        $perPage = (int) $request->integer('per_page', 10);
+        $projects = $this->projectRepository->paginateWithRelations($perPage);
+        return Inertia::render('projects/Index', [
+            'projects' => $projects,
+            'filters'  => $request->only(['search','per_page']),
+        ]);
     }
 
     public function create()
