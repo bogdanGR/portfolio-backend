@@ -4,7 +4,7 @@
         <div class="p-4">
             <div v-if="page.props.flash?.message" class="alert">
                 <Alert class="">
-                    <Rocket class="h-4 w-4"/>
+                    <Rocket class="h-4 w-4" />
                     <AlertTitle>Notification</AlertTitle>
                     <AlertDescription>
                         {{ page.props.flash.message }}
@@ -31,8 +31,8 @@
                         <TableCell>{{ skill.name }}</TableCell>
                         <TableCell>{{ skill.slug }}</TableCell>
                         <TableCell>{{ skill.category }}</TableCell>
-                        <TableCell class=" space-x-2">
-                            <Link :href="route('technologies.edit', {id: skill.id})">
+                        <TableCell class="space-x-2">
+                            <Link :href="route('technologies.edit', { id: skill.id })">
                                 <Button>Edit</Button>
                             </Link>
                             <Button class="bg-red-600" @click="handleDelete(skill.id)">Delete</Button>
@@ -44,33 +44,25 @@
     </AppLayout>
 </template>
 <script setup lang="ts">
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import Button from '@/components/ui/button/Button.vue';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link, usePage, router } from '@inertiajs/vue3';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { Rocket } from 'lucide-vue-next';
-import {
-    Table,
-    TableBody,
-    TableCaption,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table'
 
 interface Technology {
-    id: number,
-    name: string,
-    slug: string,
-    category: string
+    id: number;
+    name: string;
+    slug: string;
+    category: string;
 }
 
 interface Props {
     technologies: Technology[];
 }
-//get props from inerτia
+
 const props = defineProps<Props>();
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -81,8 +73,8 @@ const breadcrumbs: BreadcrumbItem[] = [
 const page = usePage();
 
 const handleDelete = (id: number) => {
-    if(confirm('Are you sure you want to delete this skill?')) {
-        router.delete(route('technologies.destroy', {id}));
+    if (confirm('Are you sure you want to delete this skill?')) {
+        router.delete(route('technologies.destroy', { id }));
     }
-}
+};
 </script>
