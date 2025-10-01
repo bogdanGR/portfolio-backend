@@ -11,7 +11,8 @@ use Inertia\Inertia;
 class TechnologyController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Show list of the technologies (skills)
+     * @return \Inertia\Response
      */
     public function index()
     {
@@ -22,6 +23,7 @@ class TechnologyController extends Controller
 
     /**
      * Show the form for creating a new resource.
+     * @return \Inertia\Response
      */
     public function create()
     {
@@ -32,6 +34,9 @@ class TechnologyController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     * @param Request $request
+     * @param Technology $technology
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function store(Request $request, Technology $technology)
     {
@@ -49,6 +54,8 @@ class TechnologyController extends Controller
 
     /**
      * Show the form for editing the specified resource.
+     * @param Technology $technology
+     * @return \Inertia\Response
      */
     public function edit(Technology $technology)
     {
@@ -61,7 +68,10 @@ class TechnologyController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified technology in storage.
+     * @param Request $request
+     * @param Technology $technology
+     * @return \Illuminate\Http\RedirectResponse|string
      */
     public function update(Request $request, Technology $technology)
     {
@@ -82,7 +92,9 @@ class TechnologyController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Delete technology from the database
+     * @param Technology $technology
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy(Technology $technology)
     {
