@@ -14,7 +14,7 @@
             <Link :href="route('projects.create')">
                 <Button class="mb-4">Create a new project</Button>
             </Link>
-
+            <p class="mb-1 mb-2 font-bold">Total Projects: {{ props?.projects.length }}</p>
             <Table>
                 <TableHeader>
                     <TableRow>
