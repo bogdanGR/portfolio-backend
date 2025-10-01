@@ -11,15 +11,20 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
+/**
+ *
+ */
 class TechnologyController extends Controller
 {
     /**
      * Show list of the technologies (skills)
-     * @return \Inertia\Response
+     * @param Request $request
+     * @return Response
      */
-    public function index(): Response
+    public function index(Request $request): Response
     {
-        $technologies = Technology::all();
+        $perPage = (int) $request->integer('per_page', 10);
+        $technologies = Technology::paginate($perPage);
 
         return Inertia::render('technologies/Index', compact('technologies'));
     }
