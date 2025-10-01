@@ -156,7 +156,6 @@ import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { Rocket } from 'lucide-vue-next';
 import { reactive } from 'vue';
 
-// ----- Types -----
 type LinkType = { url: string | null; label: string; active: boolean };
 
 type Paginator<Item> = {
@@ -187,14 +186,11 @@ interface Props {
     filters?: Record<string, unknown>;
 }
 
-// ----- Props / page -----
 const props = defineProps<Props>();
 const page = usePage();
 
-// ----- Breadcrumbs -----
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Projects', href: '/projects' }];
 
-// ----- Pagination navigation -----
 function goTo(page: number) {
     router.get(
         route('projects.index'),
@@ -203,14 +199,12 @@ function goTo(page: number) {
     );
 }
 
-// ----- Technologies display helpers -----
 const VISIBLE_TECH_COUNT = 3;
 
 const getTechName = (t: Technology | string) => (typeof t === 'string' ? t : (t?.name ?? ''));
 
 const getTechKey = (t: Technology | string, idx: number) => (typeof t === 'string' ? `${t}-${idx}` : `${t?.id ?? idx}-${getTechName(t)}`);
 
-// ----- Per-row popover open state + close timers -----
 const popoverOpen = reactive<Record<number, boolean>>({});
 const closeTimers = reactive<Record<number, number | undefined>>({});
 
@@ -230,7 +224,6 @@ const scheduleClose = (id: number, delay = 120) => {
     }, delay);
 };
 
-// ----- Delete handler -----
 const handleDelete = (id: number) => {
     if (confirm('Are you sure you want to delete this project?')) {
         router.delete(route('projects.destroy', { id }));
