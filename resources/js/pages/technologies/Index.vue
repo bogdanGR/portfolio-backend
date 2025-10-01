@@ -15,10 +15,10 @@
                 <Button class="mb-4">Add a new Skill</Button>
             </Link>
 
+            <p class="mb-2 font-bold">Total records: {{ props.technologies.length }}</p>
             <Table>
                 <TableHeader>
                     <TableRow>
-                        <TableHead>ID</TableHead>
                         <TableHead>Name</TableHead>
                         <TableHead>slug</TableHead>
                         <TableHead>category</TableHead>
@@ -27,7 +27,6 @@
                 </TableHeader>
                 <TableBody>
                     <TableRow v-for="skill in props.technologies" :key="skill.id">
-                        <TableCell>{{ skill.id }}</TableCell>
                         <TableCell>{{ skill.name }}</TableCell>
                         <TableCell>{{ skill.slug }}</TableCell>
                         <TableCell>{{ skill.category }}</TableCell>
