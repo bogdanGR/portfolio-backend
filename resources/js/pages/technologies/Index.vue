@@ -98,9 +98,13 @@
                         <TableCell>{{ skill.category }}</TableCell>
                         <TableCell class="space-x-2">
                             <Link :href="route('technologies.edit', { id: skill.id })">
-                                <Button>Edit</Button>
+                                <Button size="sm" variant="outline">
+                                    <Pencil class="h-3.5 w-3.5" />
+                                </Button>
                             </Link>
-                            <Button class="bg-red-600" @click="handleDelete(skill.id)">Delete</Button>
+                            <Button size="sm" variant="destructive" @click="handleDelete(skill.id)">
+                                <Trash2 class="h-3.5 w-3.5" />
+                            </Button>
                         </TableCell>
                     </TableRow>
                 </TableBody>
@@ -168,7 +172,7 @@ import { useTableFilters } from '@/composables/useTableFilters';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
-import { Plus, Rocket, X } from 'lucide-vue-next';
+import { Pencil, Plus, Rocket, Trash2, X } from 'lucide-vue-next';
 import { computed } from 'vue';
 
 type LinkType = { url: string | null; label: string; active: boolean };
