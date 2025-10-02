@@ -34,10 +34,10 @@ class TechnologyFilter extends QueryFilter
      */
     public function sort($value): void
     {
-        $direction = $this->request->input('direction', 'asc');
+        $direction = $this->request->input('direction', $this->defaultDirection());
 
         if (!in_array($direction, ['asc', 'desc'])) {
-            $direction = 'asc';
+            $direction = $this->defaultDirection();
         }
 
         $this->applySort($value, $direction);

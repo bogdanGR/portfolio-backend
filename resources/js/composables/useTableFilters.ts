@@ -15,7 +15,10 @@ interface UseTableFiltersOptions {
 export function useTableFilters(options: UseTableFiltersOptions) {
     const { routeName, initialFilters = {}, debounceMs = 300, excludeFromUrl = [] } = options;
 
-    const filters = reactive<TableFilters>({ ...initialFilters });
+    // Ensure sort and direction have values
+    const filters = reactive<TableFilters>({
+        ...initialFilters,
+    });
 
     const hasActiveFilters = computed(() => {
         return Object.entries(filters).some(([key, value]) => {
@@ -105,9 +108,8 @@ export function useTableFilters(options: UseTableFiltersOptions) {
         });
     }
 
-    // Return filters as readonly refs to prevent accidental mutation
     return {
-        filters: readonly(filters), // Make it readonly to force using updateFilter
+        filters: readonly(filters),
         hasActiveFilters,
         updateFilter,
         applyFilters,

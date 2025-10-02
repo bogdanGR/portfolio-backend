@@ -25,6 +25,11 @@ abstract class QueryFilter
             }
         }
 
+        if (!$this->request->has('sort')) {
+            $this->builder->orderBy($this->defaultSort(), $this->defaultDirection());
+        }
+
+
         return $this->builder;
     }
 
@@ -49,6 +54,14 @@ abstract class QueryFilter
     protected function defaultSort(): string
     {
         return 'id';
+    }
+
+    /**
+     * Get default sort direction
+     */
+    protected function defaultDirection(): string
+    {
+        return 'asc';
     }
 
     /**
