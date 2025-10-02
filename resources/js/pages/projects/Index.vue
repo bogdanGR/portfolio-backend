@@ -12,7 +12,10 @@
                 </Alert>
             </div>
             <Link :href="route('projects.create')">
-                <Button class="mb-4">Create a new project</Button>
+                <Button>
+                    <Plus class="mr-2 h-4 w-4" />
+                    Add Project
+                </Button>
             </Link>
             <p class="mb-1 mb-2 font-bold">Total Projects: {{ props.projects.total }}</p>
             <Table>
@@ -90,9 +93,13 @@
                         </TableCell>
                         <TableCell class="space-x-2">
                             <Link :href="route('projects.edit', { id: project.id })">
-                                <Button>Edit</Button>
+                                <Button size="sm" variant="outline">
+                                    <Pencil class="h-3.5 w-3.5" />
+                                </Button>
                             </Link>
-                            <Button class="bg-red-600" @click="handleDelete(project.id)">Delete</Button>
+                            <Button size="sm" variant="destructive" @click="handleDelete(project.id)">
+                                <Trash2 class="h-3.5 w-3.5" />
+                            </Button>
                         </TableCell>
                     </TableRow>
                 </TableBody>
@@ -151,7 +158,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
-import { Rocket } from 'lucide-vue-next';
+import { Pencil, Plus, Rocket, Trash2 } from 'lucide-vue-next';
 import { reactive } from 'vue';
 
 type LinkType = { url: string | null; label: string; active: boolean };
