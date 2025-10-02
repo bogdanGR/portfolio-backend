@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\TechnologyCategory;
+use App\Filters\TechnologyFilter;
 use App\Http\Requests\Technologies\StoreTechnologyRequest;
 use App\Http\Requests\Technologies\UpdateTechnologyRequest;
 use App\Models\Technology;
@@ -21,12 +22,19 @@ class TechnologyController extends Controller
      * @param Request $request
      * @return Response
      */
-    public function index(Request $request): Response
+    public function index(Request $request, TechnologyFilter $filter): Response
     {
-        $perPage = (int) $request->integer('per_page', 10);
-        $technologies = Technology::paginate($perPage);
+        $perPage = $request->integer('per_page', 10);
 
-        return Inertia::render('technologies/Index', compact('technologies'));
+        $technologies = Technology::filter($filter)
+            ->paginate($perPage)
+            ->withQueryString();
+
+        return Inertia::render('technologies/Index', [
+            'technologies' => $technologies,
+            'filters' => $request->only(['name', 'slug', 'category', 'sort', 'direction']),
+            'categories' => TechnologyCategory::all(),
+        ]);
     }
 
     /**

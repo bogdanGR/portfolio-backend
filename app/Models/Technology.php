@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\TechnologyCategory;
+use App\Traits\Filterable;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -22,6 +23,8 @@ use Illuminate\Support\Carbon;
  */
 class Technology extends Model
 {
+    use Filterable;
+
     /**
      * The attributes that are mass assignable.
      *
