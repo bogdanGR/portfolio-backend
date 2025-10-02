@@ -1,4 +1,3 @@
-<!-- resources/js/components/TechnologyMultiSelect.vue -->
 <script setup lang="ts">
 import { computed, onMounted, onBeforeUnmount, ref, watch } from 'vue'
 

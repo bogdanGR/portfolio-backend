@@ -11,21 +11,91 @@
                     </AlertDescription>
                 </Alert>
             </div>
-            <Link :href="route('projects.create')">
-                <Button>
-                    <Plus class="mr-2 h-4 w-4" />
-                    Add Project
-                </Button>
-            </Link>
-            <p class="mb-1 mb-2 font-bold">Total Projects: {{ props.projects.total }}</p>
+            <div class="mb-4 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <Link :href="route('projects.create')">
+                        <Button>
+                            <Plus class="mr-2 h-4 w-4" />
+                            Add New Project
+                        </Button>
+                    </Link>
+                    <Button v-if="tableFilters.hasActiveFilters.value" variant="outline" size="sm" @click="tableFilters.clearFilters">
+                        <X class="mr-1 h-4 w-4" />
+                        Clear Filters
+                    </Button>
+                </div>
+                <p class="text-sm text-muted-foreground">
+                    Total: <span class="mb-2 font-bold">{{ props.projects.total }}</span> records
+                </p>
+            </div>
             <Table>
                 <TableHeader>
                     <TableRow>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Short Description</TableHead>
+                        <SortableTableHead
+                            column="name"
+                            label="Name"
+                            :active-sort="tableFilters.filters.sort"
+                            :direction="tableFilters.filters.direction"
+                            filterable
+                            @sort="tableFilters.sortBy"
+                        >
+                            <template #filter>
+                                <ColumnFilterInput
+                                    :model-value="tableFilters.filters.name"
+                                    placeholder="Search name..."
+                                    @change="(val) => tableFilters.updateFilter('name', val, true)"
+                                />
+                            </template>
+                        </SortableTableHead>
+                        <SortableTableHead
+                            column="short_description"
+                            label="Short Description"
+                            :active-sort="tableFilters.filters.sort"
+                            :direction="tableFilters.filters.direction"
+                            filterable
+                            @sort="tableFilters.sortBy"
+                        >
+                            <template #filter>
+                                <ColumnFilterInput
+                                    :model-value="tableFilters.filters.short_description"
+                                    placeholder="Search short description..."
+                                    @change="(val) => tableFilters.updateFilter('short_description', val, true)"
+                                />
+                            </template>
+                        </SortableTableHead>
                         <TableHead>Skills</TableHead>
-                        <TableHead>Website URL</TableHead>
-                        <TableHead>Github URL</TableHead>
+                        <SortableTableHead
+                            column="link"
+                            label="Website URL"
+                            :active-sort="tableFilters.filters.sort"
+                            :direction="tableFilters.filters.direction"
+                            filterable
+                            @sort="tableFilters.sortBy"
+                        >
+                            <template #filter>
+                                <ColumnFilterInput
+                                    :model-value="tableFilters.filters.link"
+                                    placeholder="Search Website URL..."
+                                    @change="(val) => tableFilters.updateFilter('link', val, true)"
+                                />
+                            </template>
+                        </SortableTableHead>
+                        <SortableTableHead
+                            column="github"
+                            label="Github URL"
+                            :active-sort="tableFilters.filters.sort"
+                            :direction="tableFilters.filters.direction"
+                            filterable
+                            @sort="tableFilters.sortBy"
+                        >
+                            <template #filter>
+                                <ColumnFilterInput
+                                    :model-value="tableFilters.filters.github"
+                                    placeholder="Search Github URL..."
+                                    @change="(val) => tableFilters.updateFilter('github', val, true)"
+                                />
+                            </template>
+                        </SortableTableHead>
                         <TableHead>Actions</TableHead>
                     </TableRow>
                 </TableHeader>
@@ -45,14 +115,12 @@
                                         {{ getTechName(tech) }}
                                     </span>
 
-                                    <!-- overflow in popover (hover to open) -->
                                     <Popover
                                         v-if="project.technologies.length > VISIBLE_TECH_COUNT"
                                         :key="`popover-${project.id}`"
                                         :open="popoverOpen[project.id] === true"
                                         @update:open="(val) => (popoverOpen[project.id] = val)"
                                     >
-                                        <!-- Do NOT use as-child to avoid null parentNode glitches -->
                                         <PopoverTrigger
                                             class="text-xs underline decoration-dotted underline-offset-2"
                                             @focus="openPopover(project.id)"
@@ -105,47 +173,53 @@
                 </TableBody>
             </Table>
         </div>
-        <Pagination
-            v-slot="{ page }"
-            :items-per-page="props.projects.per_page"
-            :total="props.projects.total"
-            :default-page="props.projects.current_page"
-        >
-            <PaginationContent v-slot="{ items }">
-                <PaginationPrevious :disabled="props.projects.current_page <= 1" @click="goTo(props.projects.current_page - 1)" />
+        <div class="mt-4">
+            <Pagination
+                v-slot="{ page }"
+                :items-per-page="props.projects.per_page"
+                :total="props.projects.total"
+                :default-page="props.projects.current_page"
+            >
+                <PaginationContent v-slot="{ items }">
+                    <PaginationPrevious
+                        :disabled="props.projects.current_page <= 1"
+                        @click="tableFilters.goToPage(props.projects.current_page - 1)"
+                    />
 
-                <!-- If your Pagination component provides an 'items' model -->
-                <template v-if="items?.length">
-                    <template v-for="(item, index) in items" :key="index">
+                    <template v-if="items?.length">
+                        <template v-for="(item, index) in items" :key="index">
+                            <PaginationItem
+                                v-if="item.type === 'page'"
+                                :value="item.value"
+                                :is-active="item.value === props.projects.current_page"
+                                @click="tableFilters.goToPage(item.value)"
+                            >
+                                {{ item.value }}
+                            </PaginationItem>
+                        </template>
+
+                        <PaginationEllipsis v-if="items.some((i) => i.type === 'ellipsis')" />
+                    </template>
+
+                    <template v-else>
                         <PaginationItem
-                            v-if="item.type === 'page'"
-                            :value="item.value"
-                            :is-active="item.value === props.projects.current_page"
-                            @click="goTo(item.value)"
+                            v-for="n in props.projects.last_page"
+                            :key="n"
+                            :value="n"
+                            :is-active="n === props.projects.current_page"
+                            @click="tableFilters.goToPage(n)"
                         >
-                            {{ item.value }}
+                            {{ n }}
                         </PaginationItem>
                     </template>
 
-                    <PaginationEllipsis v-if="items.some((i) => i.type === 'ellipsis')" />
-                </template>
-
-                <!-- Fallback: render 1..last_page -->
-                <template v-else>
-                    <PaginationItem
-                        v-for="n in props.projects.last_page"
-                        :key="n"
-                        :value="n"
-                        :is-active="n === props.projects.current_page"
-                        @click="goTo(n)"
-                    >
-                        {{ n }}
-                    </PaginationItem>
-                </template>
-
-                <PaginationNext :disabled="props.projects.current_page >= props.projects.last_page" @click="goTo(props.projects.current_page + 1)" />
-            </PaginationContent>
-        </Pagination>
+                    <PaginationNext
+                        :disabled="props.projects.current_page >= props.projects.last_page"
+                        @click="tableFilters.goToPage(props.projects.current_page + 1)"
+                    />
+                </PaginationContent>
+            </Pagination>
+        </div>
     </AppLayout>
 </template>
 
@@ -155,10 +229,13 @@ import Button from '@/components/ui/button/Button.vue';
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import ColumnFilterInput from '@/components/ui/table/ColumnFilterInput.vue';
+import SortableTableHead from '@/components/ui/table/SortableTableHead.vue';
+import { useTableFilters } from '@/composables/useTableFilters';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
-import { Pencil, Plus, Rocket, Trash2 } from 'lucide-vue-next';
+import { Pencil, Plus, Rocket, Trash2, X } from 'lucide-vue-next';
 import { reactive } from 'vue';
 
 type LinkType = { url: string | null; label: string; active: boolean };
@@ -188,7 +265,15 @@ interface Project {
 
 interface Props {
     projects: Paginator<Project>;
-    filters?: Record<string, unknown>;
+    filters?: {
+        name?: string;
+        short_description?: string;
+        link?: string;
+        github?: string;
+        sort?: string;
+        direction?: 'asc' | 'desc';
+    };
+    technologies: string[];
 }
 
 const props = defineProps<Props>();
@@ -196,13 +281,18 @@ const page = usePage();
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Projects', href: '/projects' }];
 
-function goTo(page: number) {
-    router.get(
-        route('projects.index'),
-        { ...(props.filters ?? {}), page }, // keep filters, change page
-        { preserveScroll: true, preserveState: true, replace: true },
-    );
-}
+const tableFilters = useTableFilters({
+    routeName: 'projects.index',
+    initialFilters: {
+        name: props.filters?.name || '',
+        short_description: props.filters?.short_description || '',
+        link: props.filters?.link || '',
+        github: props.filters?.github || '',
+        sort: 'name',
+        direction: 'asc',
+    },
+    debounceMs: 300,
+});
 
 const VISIBLE_TECH_COUNT = 3;
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\DeleteProjectAction;
+use App\Filters\ProjectsFilter;
 use App\Http\Requests\Projects\StoreProjectRequest;
 use App\Http\Requests\Projects\UpdateProjectRequest;
 use App\Models\Project;
@@ -24,13 +25,15 @@ class ProjectsController extends Controller
         private readonly ProjectRepository $projectRepository
     ){}
 
-    public function index(Request $request)
+    public function index(Request $request, ProjectsFilter $filter)
     {
-        $perPage = (int) $request->integer('per_page', 10);
-        $projects = $this->projectRepository->paginateWithRelations($perPage);
+        $perPage = $request->integer('per_page', 10);
+        $projects = $this->projectRepository->search($filter, $perPage);
+
         return Inertia::render('projects/Index', [
             'projects' => $projects,
-            'filters'  => $request->only(['search','per_page']),
+            'filters' => $request->only(['name', 'short_description', 'link', 'github', 'sort', 'direction']),
+            'technologies' => Technology::all(),
         ]);
     }
 
