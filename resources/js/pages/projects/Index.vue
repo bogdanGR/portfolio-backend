@@ -63,7 +63,24 @@
                                 />
                             </template>
                         </SortableTableHead>
-                        <TableHead>Skills</TableHead>
+                        <SortableTableHead
+                            column="technology"
+                            label="Skills"
+                            :active-sort="tableFilters.filters.sort"
+                            :direction="tableFilters.filters.direction"
+                            filterable
+                            @sort="tableFilters.sortBy"
+                        >
+                            <template #filter>
+                                <column-filter-multi-select
+                                    :model-value="filterTechnologies"
+                                    :options="props.technologies"
+                                    placeholder="All Skills"
+                                    search-placeholder="Search skills..."
+                                    @change="(val) => tableFilters.updateFilter('technologies', val)"
+                                />
+                            </template>
+                        </SortableTableHead>
                         <SortableTableHead
                             column="link"
                             label="Website URL"
@@ -230,13 +247,14 @@ import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, Pagi
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import ColumnFilterInput from '@/components/ui/table/ColumnFilterInput.vue';
+import ColumnFilterMultiSelect from '@/components/ui/table/ColumnFilterMultiSelect.vue';
 import SortableTableHead from '@/components/ui/table/SortableTableHead.vue';
 import { useTableFilters } from '@/composables/useTableFilters';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { Pencil, Plus, Rocket, Trash2, X } from 'lucide-vue-next';
-import { reactive } from 'vue';
+import { computed, reactive } from 'vue';
 
 type LinkType = { url: string | null; label: string; active: boolean };
 
@@ -273,7 +291,7 @@ interface Props {
         sort?: string;
         direction?: 'asc' | 'desc';
     };
-    technologies: string[];
+    technologies: Technology[];
 }
 
 const props = defineProps<Props>();
@@ -288,10 +306,16 @@ const tableFilters = useTableFilters({
         short_description: props.filters?.short_description || '',
         link: props.filters?.link || '',
         github: props.filters?.github || '',
+        technologies: props.filters?.technologies || [],
         sort: 'name',
         direction: 'asc',
     },
     debounceMs: 300,
+});
+
+const filterTechnologies = computed(() => {
+    const val = tableFilters.filters.technologies;
+    return Array.isArray(val) ? val : [];
 });
 
 const VISIBLE_TECH_COUNT = 3;

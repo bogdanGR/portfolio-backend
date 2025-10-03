@@ -21,7 +21,6 @@ class ProjectRepository
                 'files' => fn ($q) => $q->orderBy('project_files.sort_order'),
                 'technologies' => fn ($q) => $q->orderBy('project_technology.sort_order'),
             ])
-            ->orderByDesc('created_at')
             ->paginate($perPage)
             ->withQueryString();
     }

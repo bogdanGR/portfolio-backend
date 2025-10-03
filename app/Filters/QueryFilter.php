@@ -10,6 +10,10 @@ abstract class QueryFilter
     protected Request $request;
     protected Builder $builder;
 
+    /**
+     * Filters that should be skipped during automatic application
+     */
+    protected array $skipFilters = ['direction'];
     public function __construct(Request $request)
     {
         $this->request = $request;
@@ -20,6 +24,10 @@ abstract class QueryFilter
         $this->builder = $builder;
 
         foreach ($this->filters() as $filter => $value) {
+            if (in_array($filter, $this->skipFilters)) {
+                continue;
+            }
+
             if (method_exists($this, $filter) && $this->hasValue($filter)) {
                 $this->$filter($value);
             }
@@ -28,7 +36,6 @@ abstract class QueryFilter
         if (!$this->request->has('sort')) {
             $this->builder->orderBy($this->defaultSort(), $this->defaultDirection());
         }
-
 
         return $this->builder;
     }
@@ -40,6 +47,12 @@ abstract class QueryFilter
 
     protected function hasValue(string $filter): bool
     {
+        $value = $this->request->input($filter);
+
+        if (is_array($value)) {
+            return !empty($value);
+        }
+
         return $this->request->filled($filter);
     }
 

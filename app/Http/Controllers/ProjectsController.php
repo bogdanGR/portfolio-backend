@@ -32,8 +32,8 @@ class ProjectsController extends Controller
 
         return Inertia::render('projects/Index', [
             'projects' => $projects,
-            'filters' => $request->only(['name', 'short_description', 'link', 'github', 'sort', 'direction']),
-            'technologies' => Technology::all(),
+            'filters' => $request->only(['name', 'short_description', 'link', 'github', 'technologies', 'sort', 'direction']),
+            'technologies' => Technology::getMappedTechnologies(),
         ]);
     }
 

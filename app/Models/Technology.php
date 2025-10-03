@@ -4,7 +4,7 @@ namespace App\Models;
 
 use App\Enums\TechnologyCategory;
 use App\Traits\Filterable;
-use Illuminate\Database\Eloquent\Collection;
+use \Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Carbon;
@@ -53,5 +53,20 @@ class Technology extends Model
         return [
             'category' => TechnologyCategory::class,
         ];
+    }
+
+    /**
+     * Return all technologies as assosiative array id,name
+     * @return \Illuminate\Support\Collection
+     */
+    public static function getMappedTechnologies(): Collection
+    {
+        return self::select('id', 'name')
+            ->orderBy('name')
+            ->get()
+            ->map(fn($tech) => [
+                'id' => (string) $tech->id,
+                'name' => $tech->name,
+            ]);
     }
 }
