@@ -26,6 +26,10 @@ class TechnologyController extends Controller
     {
         $perPage = $request->integer('per_page', 10);
 
+        if ($perPage <= 0) {
+            $perPage = 10;
+        }
+
         $technologies = Technology::filter($filter)
             ->paginate($perPage)
             ->withQueryString();

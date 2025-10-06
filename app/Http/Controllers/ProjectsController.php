@@ -28,6 +28,11 @@ class ProjectsController extends Controller
     public function index(Request $request, ProjectsFilter $filter)
     {
         $perPage = $request->integer('per_page', 10);
+
+        if ($perPage <= 0) {
+            $perPage = 10;
+        }
+
         $projects = $this->projectRepository->search($filter, $perPage);
 
         return Inertia::render('projects/Index', [
