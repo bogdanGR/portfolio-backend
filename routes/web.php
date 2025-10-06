@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\ProjectsController;
+use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TechnologyController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -15,16 +15,16 @@ Route::get('dashboard', function () {
 
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/projects', [ProjectsController::class, 'index'])->name('projects.index');
-    Route::get('/projects/create', [ProjectsController::class, 'create'])->name('projects.create');
-    Route::post('/projects', [ProjectsController::class, 'store'])->name('projects.store');
-    Route::get('/projects/{project}/edit', [ProjectsController::class, 'edit'])->name('projects.edit');
-    Route::put('/projects/{project}', [ProjectsController::class, 'update'])->name('projects.update');
-    Route::delete('/projects/{project}', [ProjectsController::class, 'destroy'])->name('projects.destroy');
+    Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
+    Route::get('/projects/create', [ProjectController::class, 'create'])->name('projects.create');
+    Route::post('/projects', [ProjectController::class, 'store'])->name('projects.store');
+    Route::get('/projects/{project}/edit', [ProjectController::class, 'edit'])->name('projects.edit');
+    Route::put('/projects/{project}', [ProjectController::class, 'update'])->name('projects.update');
+    Route::delete('/projects/{project}', [ProjectController::class, 'destroy'])->name('projects.destroy');
 
-    Route::delete('projects/{project}/images/{fileId}', [ProjectsController::class, 'detachImage'])->name('projects.detachImage');
-    Route::post('projects/{project}/images/{fileId}/featured', [ProjectsController::class, 'setFeaturedImage'])->name('projects.setFeaturedImage');
-    Route::post('projects/{project}/images/reorder', [ProjectsController::class, 'reorderImages'])->name('projects.reorderImages');
+    Route::delete('projects/{project}/images/{fileId}', [ProjectController::class, 'detachImage'])->name('projects.detachImage');
+    Route::post('projects/{project}/images/{fileId}/featured', [ProjectController::class, 'setFeaturedImage'])->name('projects.setFeaturedImage');
+    Route::post('projects/{project}/images/reorder', [ProjectController::class, 'reorderImages'])->name('projects.reorderImages');
 });
 
 Route::resource('technologies', TechnologyController::class)->middleware(['auth', 'verified']);

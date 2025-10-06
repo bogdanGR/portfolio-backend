@@ -13,7 +13,7 @@ use App\Services\ProjectService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-class ProjectsController extends Controller
+class ProjectController extends Controller
 {
     /**
      * Inject project service and project repository
