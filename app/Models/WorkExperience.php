@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Carbon;
 
 class WorkExperience extends Model
 {
@@ -25,6 +26,8 @@ class WorkExperience extends Model
         'end_date'   => 'date',
     ];
 
+    protected $appends = ['formatted_start_date', 'formatted_end_date'];
+
     /**
      * Return duration of work experience
      * @return string
@@ -34,5 +37,23 @@ class WorkExperience extends Model
         $start = $this->start_date?->format('M Y');
         $end   = $this->end_date?->format('M Y');
         return trim(($start ?? '') . ' — ' . ($end ?? ''));
+    }
+
+    /**
+     * Returns formatted start date
+     * @return string
+     */
+    public function getFormattedStartDateAttribute(): string
+    {
+        return Carbon::parse($this->start_date)->format('d/m/Y');
+    }
+
+    /**
+     * Returns formatted end date
+     * @return string
+     */
+    public function getFormattedEndDateAttribute(): string
+    {
+        return Carbon::parse($this->end_date)->format('d/m/Y');
     }
 }
