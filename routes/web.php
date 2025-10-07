@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DevProfileController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TechnologyController;
 use Illuminate\Support\Facades\Route;
@@ -28,5 +29,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 Route::resource('technologies', TechnologyController::class)->middleware(['auth', 'verified']);
+Route::middleware(['auth'])->group(function () {
+    Route::get('/dev-profile/edit', [DevProfileController::class, 'edit'])->name('dev_profile.edit');
+    Route::post('/dev-profile', [DevProfileController::class, 'update'])->name('dev_profile.update');
+
+    Route::post('/dev-profile/avatar', [DevProfileController::class, 'uploadAvatar'])->name('dev_profile.avatar.upload');
+    Route::post('/dev-profile/resume', [DevProfileController::class, 'uploadResume'])->name('dev_profile.resume.upload');
+
+    Route::delete('/dev-profile/avatar', [DevProfileController::class, 'deleteAvatar'])->name('dev_profile.avatar.delete');
+    Route::delete('/dev-profile/resume', [DevProfileController::class, 'deleteResume'])->name('dev_profile.resume.delete');
+});
+
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
