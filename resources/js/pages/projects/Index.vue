@@ -74,7 +74,7 @@
                             <template #filter>
                                 <column-filter-multi-select
                                     :model-value="filterTechnologies"
-                                    :options="props.technologies"
+                                    :options="technologyOptions"
                                     placeholder="All Skills"
                                     search-placeholder="Search skills..."
                                     @change="(val) => tableFilters.updateFilter('technologies', val)"
@@ -317,6 +317,13 @@ const filterTechnologies = computed(() => {
     const val = tableFilters.filters.technologies;
     return Array.isArray(val) ? val : [];
 });
+
+const technologyOptions = computed(() =>
+    (props.technologies ?? []).map((t) => ({
+        value: String(t.id),
+        label: t.name ?? '',
+    })),
+);
 
 const VISIBLE_TECH_COUNT = 3;
 
