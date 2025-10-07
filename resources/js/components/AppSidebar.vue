@@ -6,7 +6,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/vue3';
-import { BookOpen, Code, Folder, FolderDot, LayoutGrid, UserPen } from 'lucide-vue-next';
+import { BookOpen, Briefcase, Code, Folder, FolderDot, LayoutGrid, UserPen } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
 
 const mainNavItems: NavItem[] = [
@@ -29,6 +29,11 @@ const mainNavItems: NavItem[] = [
         title: "Developer' Profile",
         href: '/dev-profile/edit',
         icon: UserPen,
+    },
+    {
+        title: 'Work Experience',
+        href: '/work-experience',
+        icon: Briefcase,
     },
 ];
 
