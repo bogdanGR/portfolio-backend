@@ -32,7 +32,7 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: 'Work Experience',
-        href: '/work-experience',
+        href: '/work-experiences',
         icon: Briefcase,
     },
 ];
