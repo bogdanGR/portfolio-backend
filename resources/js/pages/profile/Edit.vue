@@ -82,7 +82,10 @@
 
                         <div>
                             <Label for="years_experience" class="mb-2">Years of Experience</Label>
-                            <Input id="years_experience" v-model="form.years_experience" type="text" placeholder="5+" />
+                            <Input id="years_experience" v-model="form.years_experience" type="text" placeholder="5" />
+                            <p v-if="form.errors.years_experience" class="mt-1 text-sm text-red-500">
+                                {{ form.errors.years_experience }}
+                            </p>
                         </div>
 
                         <div>
@@ -162,11 +165,17 @@
                             <div>
                                 <Label for="phone" class="mb-2">Phone</Label>
                                 <Input id="phone" v-model="form.phone" type="tel" placeholder="+30 123 456 7890" />
+                                <p v-if="form.errors.phone" class="mt-1 text-sm text-red-500">
+                                    {{ form.errors.phone }}
+                                </p>
                             </div>
 
                             <div>
                                 <Label for="location" class="mb-2">Location</Label>
                                 <Input id="location" v-model="form.location" type="text" placeholder="Athens, Greece" />
+                                <p v-if="form.errors.location" class="mt-1 text-sm text-red-500">
+                                    {{ form.errors.location }}
+                                </p>
                             </div>
                         </div>
                     </CardContent>
@@ -185,6 +194,9 @@
                                 GitHub
                             </Label>
                             <Input id="github_url" v-model="form.github_url" type="url" placeholder="https://github.com/yourusername" />
+                            <p v-if="form.errors.github_url" class="mt-1 text-sm text-red-500">
+                                {{ form.errors.github_url }}
+                            </p>
                         </div>
 
                         <div>
@@ -193,6 +205,9 @@
                                 LinkedIn
                             </Label>
                             <Input id="linkedin_url" v-model="form.linkedin_url" type="url" placeholder="https://linkedin.com/in/yourusername" />
+                            <p v-if="form.errors.linkedin_url" class="mt-1 text-sm text-red-500">
+                                {{ form.errors.linkedin_url }}
+                            </p>
                         </div>
 
                         <div>
@@ -201,6 +216,9 @@
                                 Website
                             </Label>
                             <Input id="website_url" v-model="form.website_url" type="url" placeholder="https://yourwebsite.com" />
+                            <p v-if="form.errors.website_url" class="mt-1 text-sm text-red-500">
+                                {{ form.errors.website_url }}
+                            </p>
                         </div>
                     </CardContent>
                 </Card>
@@ -221,22 +239,37 @@
                         <div>
                             <Label for="degree" class="mb-2"> Degree </Label>
                             <Input id="degree" v-model="form.degree" type="text" placeholder="Master's degree" />
+                            <p v-if="form.errors.degree" class="mt-1 text-sm text-red-500">
+                                {{ form.errors.degree }}
+                            </p>
                         </div>
                         <div>
                             <Label for="start_date_uni" class="mb-2"> Start date </Label>
                             <Input id="start_date_uni" v-model="form.start_date_uni" type="date" />
+                            <p v-if="form.errors.start_date_uni" class="mt-1 text-sm text-red-500">
+                                {{ form.errors.start_date_uni }}
+                            </p>
                         </div>
                         <div>
                             <Label for="end_date_uni" class="mb-2"> End date </Label>
                             <Input id="end_date_uni" v-model="form.end_date_uni" type="date" />
+                            <p v-if="form.errors.end_date_uni" class="mt-1 text-sm text-red-500">
+                                {{ form.errors.end_date_uni }}
+                            </p>
                         </div>
                         <div>
                             <Label for="degree_url" class="mb-2"> Degree url </Label>
                             <Input id="degree_url" v-model="form.degree_url" type="url" />
+                            <p v-if="form.errors.degree_url" class="mt-1 text-sm text-red-500">
+                                {{ form.errors.degree_url }}
+                            </p>
                         </div>
                         <div>
                             <Label for="diploma_thesis_url" class="mb-2"> Diploma thesis url </Label>
                             <Input id="diploma_thesis_url" v-model="form.diploma_thesis_url" type="url" />
+                            <p v-if="form.errors.diploma_thesis_url" class="mt-1 text-sm text-red-500">
+                                {{ form.errors.diploma_thesis_url }}
+                            </p>
                         </div>
                     </CardContent>
                 </Card>
