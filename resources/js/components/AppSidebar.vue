@@ -6,7 +6,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/vue3';
-import { BookOpen, Briefcase, Code, Folder, FolderDot, LayoutGrid, UserPen } from 'lucide-vue-next';
+import { BookOpen, Briefcase, Code, Folder, FolderDot, GraduationCap, LayoutGrid, UserPen } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
 
 const mainNavItems: NavItem[] = [
@@ -34,6 +34,11 @@ const mainNavItems: NavItem[] = [
         title: 'Work Experience',
         href: '/work-experiences',
         icon: Briefcase,
+    },
+    {
+        title: 'Certifications',
+        href: '/certifications',
+        icon: GraduationCap,
     },
 ];
 

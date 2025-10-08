@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CertificationController;
 use App\Http\Controllers\DevProfileController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TechnologyController;
@@ -31,6 +32,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 Route::resource('technologies', TechnologyController::class)->middleware(['auth', 'verified']);
 Route::resource('work-experiences', WorkExperienceController::class)->middleware(['auth', 'verified']);
+Route::resource('certifications', CertificationController::class)->middleware(['auth', 'verified']);
+
 Route::middleware(['auth'])->group(function () {
     Route::get('/dev-profile/edit', [DevProfileController::class, 'edit'])->name('dev_profile.edit');
     Route::post('/dev-profile', [DevProfileController::class, 'update'])->name('dev_profile.update');
