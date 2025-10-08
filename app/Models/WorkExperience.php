@@ -23,8 +23,8 @@ class WorkExperience extends Model
     ];
 
     protected $casts = [
-        'start_date' => 'date',
-        'end_date'   => 'date',
+        'start_date' => 'date:Y-m-d',
+        'end_date'   => 'date:Y-m-d',
     ];
 
     protected $appends = ['formatted_start_date', 'formatted_end_date'];
