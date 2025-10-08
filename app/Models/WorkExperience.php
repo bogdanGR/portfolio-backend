@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\Filterable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Carbon;
 
 class WorkExperience extends Model
 {
-    use HasFactory;
+    use HasFactory, Filterable;
 
     protected $table = 'work_experience';
 
