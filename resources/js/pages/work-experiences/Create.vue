@@ -6,7 +6,7 @@ import WorkExperienceForm from './Partials/WorkExperienceForm.vue';
 
 <template>
     <Head title="Create Work Experience" />
-    <AppLayout :breadcrumbs="[{ label: 'Work Experience', href: route('work-experiences.index') }, { label: 'Create' }]">
+    <AppLayout :breadcrumbs="[{ title: 'Work Experience', href: route('work-experiences.index') }, { title: 'Create' }]">
         <div class="space-y-4 p-4">
             <h1 class="text-xl font-semibold">Create Work Experience</h1>
             <WorkExperienceForm :submit-route="route('work-experiences.store')" method="post" />

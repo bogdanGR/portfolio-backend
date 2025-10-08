@@ -18,7 +18,7 @@ const props = defineProps<{
 
 <template>
     <Head :title="`Edit: ${props.experience.job_title}`" />
-    <AppLayout :breadcrumbs="[{ label: 'Work Experience', href: route('work-experiences.index') }, { label: `Edit: ${props.experience.job_title}` }]">
+    <AppLayout :breadcrumbs="[{ title: 'Work Experience', href: route('work-experiences.index') }, { title: `Edit: ${props.experience.job_title}` }]">
         <div class="space-y-4 p-4">
             <h1 class="text-xl font-semibold">Edit Work Experience</h1>
             <WorkExperienceForm :experience="props.experience" :submit-route="route('work-experiences.update', props.experience.id)" method="put" />
