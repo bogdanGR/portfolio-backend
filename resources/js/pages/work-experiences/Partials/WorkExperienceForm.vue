@@ -3,10 +3,10 @@ import { useForm } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
 // UI components (adjust paths as needed)
+import RichTextEditor from '@/components/RichTextEditor.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 
 type Experience = {
     id?: number;
@@ -37,7 +37,7 @@ const isUpdating = computed(() => props.method && props.method !== 'post');
 
 function submit() {
     if (props.method && props.method !== 'post') {
-        form.submit(props.method.toUpperCase(), props.submitRoute);
+        form.submit(props.method, props.submitRoute);
     } else {
         form.post(props.submitRoute);
     }
@@ -68,11 +68,12 @@ function submit() {
             </div>
 
             <div>
-                <Label for="description">Description</Label>
-                <Textarea id="description" v-model="form.description" rows="6" />
-                <div v-if="form.errors.description" class="mt-1 text-sm text-red-500">{{ form.errors.description }}</div>
+                <Label for="description" class="mb-2 text-gray-900 dark:text-gray-100">Description</Label>
+                <RichTextEditor v-model="form.description" class="rounded-md border border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-900" />
+                <div v-if="form.errors.description" class="mt-1 text-sm text-red-600 dark:text-red-400">
+                    {{ form.errors.description }}
+                </div>
             </div>
-
             <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div>
                     <Label for="start_date">Start Date</Label>
