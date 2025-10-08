@@ -52,4 +52,13 @@ class WorkExperienceFilter extends QueryFilter
     {
         return 'start_date';
     }
+
+    /**
+     * Get default sort direction
+     */
+    protected function defaultDirection(): string
+    {
+        return 'desc';
+    }
+
 }
