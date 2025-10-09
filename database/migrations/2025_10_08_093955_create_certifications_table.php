@@ -17,9 +17,9 @@ return new class extends Migration
             $table->string('issuing_organization');
             $table->date('issue_date');
             $table->date('expiration_date')->nullable();
-            $table->string('credential_id');
+            $table->string('credential_id')->nullable();
             $table->string('credential_url');
-            $table->foreignId('certification_image')->nullable()->constrained('files')->nullOnDelete();
+            $table->foreignId('certification_image_id')->nullable()->constrained('files')->nullOnDelete();
             $table->timestamps();
         });
     }
