@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\File;
 use App\Models\Project;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -98,7 +99,9 @@ class ProjectService
     {
         try {
             DB::transaction(function () use ($project, $fileId) {
-                $this->fileService->removeFile($project, $fileId);
+                $file = File::findOrFail($fileId);
+                $this->fileService->deleteFile($file);
+
                 $project->files()->detach($fileId);
             });
         } catch (\Exception $e) {
