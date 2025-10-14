@@ -6,11 +6,13 @@ use App\Models\File;
 use App\Models\DevProfile;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class DevProfileService
 {
+    public function __construct(
+        private FileService $fileService
+    ) {}
+
     /**
      * Update profile
      * @param DevProfile $profile
@@ -30,21 +32,21 @@ class DevProfileService
      * Delete previous avatar if exists, upload the new one.
      * @param DevProfile $profile
      * @param UploadedFile $uploadedFile
-     * @return File
+     * @return array
      * @throws \Throwable
      */
-    public function uploadAvatar(DevProfile $profile, UploadedFile $uploadedFile): File
+    public function uploadAvatar(DevProfile $profile, UploadedFile $uploadedFile): array
     {
         return DB::transaction(function () use ($profile, $uploadedFile) {
             if ($profile->avatar_file_id) {
-                $this->deleteFile($profile->avatar);
+                $this->fileService->deleteFile($profile->avatar);
             }
 
-            $file = $this->storeFile($uploadedFile, 'profile/avatar');
-
-            $profile->update(['avatar_file_id' => $file->id]);
-
-            return $file;
+            return $this->fileService->upload($profile, [$uploadedFile], [
+                'type' => 'image',
+                'relationship_type' => 'one_to_one',
+                'foreign_key' => 'avatar_file_id',
+            ]);
         });
     }
 
@@ -52,21 +54,21 @@ class DevProfileService
      * Delete previous resume if exists, upload the new one.
      * @param DevProfile $profile
      * @param UploadedFile $uploadedFile
-     * @return File
+     * @return array
      * @throws \Throwable
      */
-    public function uploadResume(DevProfile $profile, UploadedFile $uploadedFile): File
+    public function uploadResume(DevProfile $profile, UploadedFile $uploadedFile): array
     {
         return DB::transaction(function () use ($profile, $uploadedFile) {
             if ($profile->resume_file_id) {
-                $this->deleteFile($profile->resume);
+                $this->fileService->deleteFile($profile->resume);
             }
 
-            $file = $this->storeFile($uploadedFile, 'profile/resume');
-
-            $profile->update(['resume_file_id' => $file->id]);
-
-            return $file;
+            return $this->fileService->upload($profile, [$uploadedFile], [
+                'type' => 'document',
+                'relationship_type' => 'one_to_one',
+                'foreign_key' => 'resume_file_id',
+            ]);
         });
     }
 
@@ -80,8 +82,7 @@ class DevProfileService
     {
         DB::transaction(function () use ($profile) {
             if ($profile->avatar) {
-                $this->deleteFile($profile->avatar);
-                $profile->update(['avatar_file_id' => null]);
+                $this->fileService->deleteFile($profile->avatar);
             }
         });
     }
@@ -96,59 +97,8 @@ class DevProfileService
     {
         DB::transaction(function () use ($profile) {
             if ($profile->resume) {
-                $this->deleteFile($profile->resume);
-                $profile->update(['resume_file_id' => null]);
+                $this->fileService->deleteFile($profile->resume);
             }
         });
-    }
-
-    /**
-     * Store file in files table
-     * @param UploadedFile $uploadedFile
-     * @param string $directory
-     * @return File
-     */
-    private function storeFile(UploadedFile $uploadedFile, string $directory): File
-    {
-        $filename = Str::uuid() . '.' . $uploadedFile->getClientOriginalExtension();
-        $path = $uploadedFile->storeAs($directory, $filename, 'public');
-
-        return File::create([
-            'original_name' => $uploadedFile->getClientOriginalName(),
-            'filename' => $filename,
-            'path' => $path,
-            'mime_type' => $uploadedFile->getMimeType(),
-            'size' => $uploadedFile->getSize(),
-            'type' => $this->getFileType($uploadedFile->getMimeType()),
-        ]);
-    }
-
-    /**
-     * Delete file from storage and database
-     * @param File $file
-     * @return void
-     */
-    private function deleteFile(File $file): void
-    {
-        Storage::disk('public')->delete($file->path);
-        $file->delete();
-    }
-
-    /**
-     * Get file type from mime type
-     * @param string $mimeType
-     * @return string
-     */
-    private function getFileType(string $mimeType): string
-    {
-        if (str_starts_with($mimeType, 'image/')) {
-            return 'image';
-        }
-
-        if ($mimeType === 'application/pdf') {
-            return 'document';
-        }
-
-        return 'file';
     }
 }
