@@ -43,7 +43,7 @@ class Certification extends Model
      *
      * @var array<string>
      */
-    protected $with = ['file', 'technologies'];
+    protected $with = ['certificationImage', 'technologies'];
 
     /**
      * Get all files associated with this project.
