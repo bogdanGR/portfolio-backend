@@ -10,7 +10,8 @@ use Illuminate\Support\Facades\Log;
 class ProjectService
 {
     public function __construct(
-        private FileService $fileService
+        private readonly FileService $fileService,
+        private readonly TechnologyService $technologyService
     ) {}
 
     /**
@@ -36,7 +37,7 @@ class ProjectService
                     $this->fileService->upload($project, $images);
                 }
 
-                $this->syncTechnologies($project, $data['technology_ids'] ?? []);
+                $this->technologyService->syncTechnologies($project, $data['technology_ids'] ?? []);
 
                 return $project->fresh(['files', 'technologies']);
             });
@@ -69,7 +70,7 @@ class ProjectService
                     'github' => $data['github'] ?? null,
                 ]);
 
-                $this->syncTechnologies($project, $data['technology_ids'] ?? []);
+                $this->technologyService->syncTechnologies($project, $data['technology_ids'] ?? []);
 
                 if ($images) {
                     $this->fileService->upload($project, $images);
@@ -168,20 +169,5 @@ class ProjectService
             ]);
             throw $e;
         }
-    }
-
-    /**
-     * Sync technologies with proper sort order
-     * @param Project $project
-     * @param array $technologyIds
-     * @return void
-     */
-    private function syncTechnologies(Project $project, array $technologyIds): void
-    {
-        $data = [];
-        foreach ($technologyIds as $index => $techId) {
-            $data[$techId] = ['sort_order' => $index + 1];
-        }
-        $project->technologies()->sync($data);
     }
 }
