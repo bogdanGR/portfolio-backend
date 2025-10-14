@@ -32,7 +32,7 @@ class ProjectService
                 ]);
 
                 if ($images) {
-                    $this->fileService->handleImageUploads($project, $images);
+                    $this->fileService->upload($project, $images);
                 }
 
                 $this->syncTechnologies($project, $data['technology_ids'] ?? []);
@@ -71,7 +71,7 @@ class ProjectService
                 $this->syncTechnologies($project, $data['technology_ids'] ?? []);
 
                 if ($images) {
-                    $this->fileService->handleImageUploads($project, $images);
+                    $this->fileService->upload($project, $images);
                 }
 
                 return $project->fresh(['files', 'technologies']);
