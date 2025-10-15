@@ -28,7 +28,8 @@ class StoreCertificationRequest extends FormRequest
             'expiration_date' => 'nullable|date',
             'credential_id' => 'string|max:255',
             'credential_url' => 'nullable|url',
-            'certificationImage' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048|dimensions:min_width=200,min_height=200',
+            'certificationImage' => 'nullable|array|max:1',
+            'certificationImage.*' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048|dimensions:min_width=200,min_height=200',
             'technology_ids' => 'array',
             'technology_ids.*' => 'integer|exists:technologies,id',
         ];
