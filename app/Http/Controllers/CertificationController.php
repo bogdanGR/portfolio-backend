@@ -2,13 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Certification\StoreCertificationRequest;
 use App\Models\Certification;
 use App\Models\Technology;
+use App\Services\CertificationService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class CertificationController extends Controller
 {
+    public function __construct(
+        private readonly CertificationService $certificationService
+    ){}
     /**
      * Display a listing of the resource.
      */
@@ -40,11 +45,26 @@ class CertificationController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Create Certification entity
+     * @param StoreCertificationRequest $request
+     * @return \Illuminate\Http\RedirectResponse
      */
-    public function store(Request $request)
+    public function store(StoreCertificationRequest $request)
     {
-        //
+        try {
+            $this->certificationService->create(
+                $request->validated(),
+                $request->file('certificationImage')
+            );
+
+            return redirect()
+                ->route('certifications.index')
+                ->with('message', 'Certification created successfully!');
+        } catch (\Exception $e) {
+            return back()
+                ->withErrors(['message' => 'Failed to create Certification.'])
+                ->withInput();
+        }
     }
 
     /**
