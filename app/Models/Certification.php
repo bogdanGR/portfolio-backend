@@ -32,10 +32,11 @@ class Certification extends Model
     protected $fillable = [
         'name',
         'issuing_organization',
-        'issuing_organization',
         'issue_date',
+        'expiration_date',
         'credential_id',
         'credential_url',
+        'certification_image_id',
     ];
 
     /**
