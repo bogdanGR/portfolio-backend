@@ -6,6 +6,7 @@ use Carbon\Traits\Date;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Carbon;
 
 /**
  * Project Model
@@ -39,6 +40,13 @@ class Certification extends Model
         'certification_image_id',
     ];
 
+    protected $casts = [
+        'issue_date' => 'date:Y-m-d',
+        'expiration_date'   => 'date:Y-m-d',
+    ];
+
+    protected $appends = ['formatted_issue_date', 'formatted_expiration_date',];
+
     /**
      * The relationships that should always be loaded.
      *
@@ -67,5 +75,23 @@ class Certification extends Model
             ->withPivot(['sort_order'])
             ->withTimestamps()
             ->orderBy('certification_technology.sort_order');
+    }
+
+    /**
+     * Returns formatted start date
+     * @return string
+     */
+    public function getFormattedIssueDateAttribute(): string
+    {
+        return Carbon::parse($this->issue_date)->format('d/m/Y');
+    }
+
+    /**
+     * Returns formatted end date
+     * @return string
+     */
+    public function getFormattedExpirationDateAttribute(): string
+    {
+        return Carbon::parse($this->expiration_date)->format('d/m/Y');
     }
 }
