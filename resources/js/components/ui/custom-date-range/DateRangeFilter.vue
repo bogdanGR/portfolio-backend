@@ -69,10 +69,11 @@ const formatDate = (dateStr: string | null | undefined): string => {
 
     try {
         const date = parseDate(dateStr);
-        return new Intl.DateTimeFormat('en-US', {
-            month: 'short',
+        return new Intl.DateTimeFormat('el-GR', {
             day: 'numeric',
+            month: 'numeric',
             year: 'numeric',
+            timeZone: 'Europe/Athens'
         }).format(date.toDate(getLocalTimeZone()));
     } catch (e) {
         return dateStr;
