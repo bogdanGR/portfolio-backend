@@ -44,7 +44,7 @@
                             <template #filter>
                                 <ColumnFilterInput
                                     :model-value="tableFilters.filters.id"
-                                    placeholder="Search name..."
+                                    placeholder="Search id..."
                                     @change="(val) => tableFilters.updateFilter('id', val, true)"
                                 />
                             </template>
@@ -154,6 +154,24 @@
                                 />
                             </template>
                         </SortableTableHead>
+                        <SortableTableHead
+                            column="technology"
+                            label="Skills"
+                            :active-sort="tableFilters.filters.sort"
+                            :direction="tableFilters.filters.direction"
+                            filterable
+                            @sort="tableFilters.sortBy"
+                        >
+                            <template #filter>
+                                <column-filter-multi-select
+                                    :model-value="filterTechnologies"
+                                    :options="technologyOptions"
+                                    placeholder="All Skills"
+                                    search-placeholder="Search skills..."
+                                    @change="(val) => tableFilters.updateFilter('technologies', val)"
+                                />
+                            </template>
+                        </SortableTableHead>
                         <TableHead>Actions</TableHead>
                     </TableRow>
                 </TableHeader>
@@ -169,6 +187,56 @@
                         <TableCell>{{ certificate.formatted_expiration_date }}</TableCell>
                         <TableCell>{{ certificate.credential_id }}</TableCell>
                         <TableCell>{{ certificate.credential_url }}</TableCell>
+                        <TableCell class="max-w-[280px]">
+                            <div class="flex items-center gap-1">
+                                <template v-if="Array.isArray(certificate.technologies) && certificate.technologies.length">
+                                    <!-- show first 2 badges -->
+                                    <span
+                                        v-for="(tech, i) in certificate.technologies.slice(0, VISIBLE_TECH_COUNT)"
+                                        :key="getTechKey(tech, i)"
+                                        class="inline-flex items-center rounded-md border border-gray-300 bg-white px-2 py-0.5 text-xs text-gray-700 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200"
+                                    >
+                                        {{ getTechName(tech) }}
+                                    </span>
+
+                                    <Popover
+                                        v-if="certificate.technologies.length > VISIBLE_TECH_COUNT"
+                                        :key="`popover-${certificate.id}`"
+                                        :open="popoverOpen[certificate.id] === true"
+                                        @update:open="(val) => (popoverOpen[certificate.id] = val)"
+                                    >
+                                        <PopoverTrigger
+                                            class="text-xs underline decoration-dotted underline-offset-2"
+                                            @focus="openPopover(certificate.id)"
+                                            @mouseenter="openPopover(certificate.id)"
+                                            @mouseleave="scheduleClose(certificate.id)"
+                                        >
+                                            +{{ certificate.technologies.length - VISIBLE_TECH_COUNT }} more
+                                        </PopoverTrigger>
+
+                                        <PopoverContent
+                                            align="start"
+                                            class="w-64"
+                                            side="bottom"
+                                            @mouseenter="openPopover(certificate.id)"
+                                            @mouseleave="scheduleClose(certificate.id)"
+                                        >
+                                            <div class="flex flex-wrap gap-1">
+                                                <span
+                                                    v-for="(tech, i) in certificate.technologies.slice(VISIBLE_TECH_COUNT)"
+                                                    :key="getTechKey(tech, i + VISIBLE_TECH_COUNT)"
+                                                    class="inline-flex items-center rounded-md border border-gray-300 bg-white px-2 py-0.5 text-xs text-gray-700 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200"
+                                                >
+                                                    {{ getTechName(tech) }}
+                                                </span>
+                                            </div>
+                                        </PopoverContent>
+                                    </Popover>
+                                </template>
+
+                                <span v-else class="text-gray-400">—</span>
+                            </div>
+                        </TableCell>
                         <TableCell class="space-x-2">
                             <Link :href="route('certifications.edit', { id: certificate.id })">
                                 <Button size="sm" variant="outline">
@@ -238,14 +306,17 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import Button from '@/components/ui/button/Button.vue';
 import DateRangeFilter from '@/components/ui/custom-date-range/DateRangeFilter.vue';
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import ColumnFilterInput from '@/components/ui/table/ColumnFilterInput.vue';
+import ColumnFilterMultiSelect from '@/components/ui/table/ColumnFilterMultiSelect.vue';
 import SortableTableHead from '@/components/ui/table/SortableTableHead.vue';
 import { useTableFilters } from '@/composables/useTableFilters';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { Pencil, Plus, Rocket, Trash2, X } from 'lucide-vue-next';
+import { computed, reactive } from 'vue';
 
 type LinkType = { url: string | null; label: string; active: boolean };
 
@@ -258,6 +329,11 @@ type Paginator<Item> = {
     links: LinkType[];
 };
 
+interface Technology {
+    id?: number;
+    name?: string;
+}
+
 interface Certifications {
     id: number;
     name: string;
@@ -268,6 +344,7 @@ interface Certifications {
     expiration_date: string;
     credential_id: string;
     credential_url: string;
+    technologies?: (Technology | string)[];
 }
 
 interface Props {
@@ -282,10 +359,11 @@ interface Props {
         sort?: string;
         direction?: 'asc' | 'desc';
     };
+    technologies: Technology[];
 }
 
 const props = defineProps<Props>();
-console.log(props);
+
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'certifications',
@@ -306,6 +384,7 @@ const tableFilters = useTableFilters({
         expiration_date: props.filters?.expiration_date || '',
         credential_id: props.filters?.credential_id || '',
         credential_url: props.filters?.credential_url || '',
+        technologies: props.filters?.technologies || [],
         sort: 'name',
         direction: 'asc',
     },
@@ -322,20 +401,42 @@ const handleExpirationDateChange = (value: { start: string | null; end: string |
     tableFilters.updateFilter('expiration_date_end', value.end, true);
 };
 
-// Transform categories for select options
-// const categoryOptions = computed(() =>
-//     props.categories.map((cat) => ({
-//         value: cat,
-//         label: formatCategory(cat),
-//     })),
-// );
-//
-// function formatCategory(category: string): string {
-//     return category
-//         .split('_')
-//         .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-//         .join(' ');
-// }
+const filterTechnologies = computed(() => {
+    const val = tableFilters.filters.technologies;
+    return Array.isArray(val) ? val : [];
+});
+
+const technologyOptions = computed(() =>
+    (props.technologies ?? []).map((t) => ({
+        value: String(t.id),
+        label: t.name ?? '',
+    })),
+);
+
+const VISIBLE_TECH_COUNT = 3;
+
+const getTechName = (t: Technology | string) => (typeof t === 'string' ? t : (t?.name ?? ''));
+
+const getTechKey = (t: Technology | string, idx: number) => (typeof t === 'string' ? `${t}-${idx}` : `${t?.id ?? idx}-${getTechName(t)}`);
+
+const popoverOpen = reactive<Record<number, boolean>>({});
+const closeTimers = reactive<Record<number, number | undefined>>({});
+
+const openPopover = (id: number) => {
+    if (closeTimers[id]) {
+        clearTimeout(closeTimers[id]);
+        closeTimers[id] = undefined;
+    }
+    popoverOpen[id] = true;
+};
+
+const scheduleClose = (id: number, delay = 120) => {
+    if (closeTimers[id]) clearTimeout(closeTimers[id]);
+    closeTimers[id] = window.setTimeout(() => {
+        popoverOpen[id] = false;
+        closeTimers[id] = undefined;
+    }, delay);
+};
 
 const handleDelete = (id: number) => {
     if (confirm('Are you sure you want to delete this certificate?')) {

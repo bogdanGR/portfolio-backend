@@ -31,6 +31,7 @@ class CertificationController extends Controller
             ->withQueryString();
         return Inertia::render('certifications/Index', [
             'certifications' => $certifications,
+            'technologies' => Technology::getMappedTechnologies(),
         ]);
     }
 
