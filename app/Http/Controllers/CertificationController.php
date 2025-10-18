@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Filters\CertificationFilter;
 use App\Http\Requests\Certification\StoreCertificationRequest;
+use App\Http\Requests\Certification\UpdateCertificationRequest;
 use App\Models\Certification;
 use App\Models\Technology;
 use App\Repositories\CertificationRepository;
@@ -27,7 +28,7 @@ class CertificationController extends Controller
         if ($perPage <= 0) {
             $perPage = 10;
         }
-        
+
         $certifications = $this->certificationRepository->search($filter, $perPage);
 
         return Inertia::render('certifications/Index', [
@@ -56,7 +57,7 @@ class CertificationController extends Controller
         try {
             $this->certificationService->create(
                 $request->validated(),
-                $request->file('certificationImage')
+                [$request->file('certificationImage')]
             );
 
             return redirect()
@@ -80,17 +81,32 @@ class CertificationController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Certification $certification)
     {
-        //
+        $data = $this->certificationRepository->getEditData($certification);
+        return Inertia::render('certifications/Edit', $data);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateCertificationRequest $request, Certification $certification)
     {
-        //
+        try {
+            $this->certificationService->update(
+                $certification,
+                $request->validated(),
+                $request->file('certificationImage')
+            );
+
+            return redirect()
+                ->route('certifications.index')
+                ->with('message', 'Certification updated successfully!');
+        } catch (\Exception $e) {
+            return back()
+                ->withErrors(['message' => 'Failed to update Certification. Please try again.'])
+                ->withInput();
+        }
     }
 
     /**
