@@ -27,12 +27,9 @@ class CertificationController extends Controller
         if ($perPage <= 0) {
             $perPage = 10;
         }
-
-//        $certifications = Certification::query()
-//            ->orderByDesc('name')
-//            ->paginate($perPage)
-//            ->withQueryString();
+        
         $certifications = $this->certificationRepository->search($filter, $perPage);
+
         return Inertia::render('certifications/Index', [
             'certifications' => $certifications,
             'technologies' => Technology::getMappedTechnologies(),
