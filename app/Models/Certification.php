@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\Filterable;
 use Carbon\Traits\Date;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -28,6 +29,7 @@ use Illuminate\Support\Carbon;
  */
 class Certification extends Model
 {
+    use Filterable;
     protected $table = 'certifications';
 
     protected $fillable = [

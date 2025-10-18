@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Filters\CertificationFilter;
 use App\Http\Requests\Certification\StoreCertificationRequest;
 use App\Models\Certification;
 use App\Models\Technology;
+use App\Repositories\CertificationRepository;
 use App\Services\CertificationService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -12,12 +14,13 @@ use Inertia\Inertia;
 class CertificationController extends Controller
 {
     public function __construct(
-        private readonly CertificationService $certificationService
+        private readonly CertificationService $certificationService,
+        private readonly CertificationRepository $certificationRepository
     ){}
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index(Request $request, CertificationFilter $filter)
     {
         $perPage = $request->integer('per_page', 10);
 
@@ -25,10 +28,11 @@ class CertificationController extends Controller
             $perPage = 10;
         }
 
-        $certifications = Certification::query()
-            ->orderByDesc('name')
-            ->paginate($perPage)
-            ->withQueryString();
+//        $certifications = Certification::query()
+//            ->orderByDesc('name')
+//            ->paginate($perPage)
+//            ->withQueryString();
+        $certifications = $this->certificationRepository->search($filter, $perPage);
         return Inertia::render('certifications/Index', [
             'certifications' => $certifications,
             'technologies' => Technology::getMappedTechnologies(),

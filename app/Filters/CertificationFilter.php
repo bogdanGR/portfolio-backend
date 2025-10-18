@@ -6,6 +6,7 @@ class CertificationFilter extends QueryFilter
 {
     /**
      * Filter by id
+     * @param $value
      */
     public function id($value): void
     {
@@ -14,6 +15,7 @@ class CertificationFilter extends QueryFilter
 
     /**
      * Filter by name
+     * @param $value
      */
     public function name($value): void
     {
@@ -22,6 +24,7 @@ class CertificationFilter extends QueryFilter
 
     /**
      * Filter by issuing_organization
+     * @param $value
      */
     public function issuing_organization($value): void
     {
@@ -29,7 +32,52 @@ class CertificationFilter extends QueryFilter
     }
 
     /**
+     * Filter by issue_date start (greater than or equal)
+     * @param $value
+     */
+    public function issue_date_start($value): void
+    {
+        if (!empty($value)) {
+            $this->builder->where('issue_date', '>=', $value);
+        }
+    }
+
+    /**
+     * Filter by issue_date end (less than or equal)
+     * @param $value
+     */
+    public function issue_date_end($value): void
+    {
+        if (!empty($value)) {
+            $this->builder->where('issue_date', '<=', $value);
+        }
+    }
+
+    /**
+     * Filter by expiration_date start (greater than or equal)
+     * @param $value
+     */
+    public function expiration_date_start($value): void
+    {
+        if (!empty($value)) {
+            $this->builder->where('expiration_date', '>=', $value);
+        }
+    }
+
+    /**
+     * Filter by expiration_date end (less than or equal)
+     * @param $value
+     */
+    public function expiration_date_end($value): void
+    {
+        if (!empty($value)) {
+            $this->builder->where('expiration_date', '<=', $value);
+        }
+    }
+
+    /**
      * Filter by credential_id
+     * @param $value
      */
     public function credential_id($value): void
     {
@@ -38,6 +86,7 @@ class CertificationFilter extends QueryFilter
 
     /**
      * Filter by credential_id
+     * @param $value
      */
     public function credential_url($value): void
     {
@@ -46,6 +95,7 @@ class CertificationFilter extends QueryFilter
 
     /**
      * Filter by technologies (accepts comma-separated IDs or array)
+     * @param $value
      */
     public function technologies($value): void
     {
@@ -66,6 +116,7 @@ class CertificationFilter extends QueryFilter
 
     /**
      * Sort by column
+     * @param $value
      */
     public function sort($value): void
     {
@@ -85,15 +136,16 @@ class CertificationFilter extends QueryFilter
 
     /**
      * Sort by the first technology name
+     * @param string $direction
      */
     protected function sortByTechnology(string $direction): void
     {
         $this->builder->orderBy(
-            \DB::table('project_technology')
-                ->join('technologies', 'project_technology.technology_id', '=', 'technologies.id')
+            \DB::table('certification_technology')
+                ->join('technologies', 'certification_technology.technology_id', '=', 'technologies.id')
                 ->select('technologies.name')
-                ->whereColumn('project_technology.project_id', 'projects.id')
-                ->orderBy('project_technology.sort_order')
+                ->whereColumn('certification_technology.certification_id', 'certifications.id')
+                ->orderBy('certification_technology.sort_order')
                 ->limit(1),
             $direction
         );
@@ -101,6 +153,7 @@ class CertificationFilter extends QueryFilter
 
     /**
      * Allowed columns for sorting
+     * @return array
      */
     protected function allowedSorts(): array
     {
