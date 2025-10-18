@@ -63,7 +63,6 @@ const value = computed({
     },
     set: (newValue: DateValue | undefined) => {
         if (newValue) {
-            // Use the toString() method which gives YYYY-MM-DD format
             const isoString = newValue.toString();
             emit('update:modelValue', isoString);
             emit('change', isoString);
@@ -74,7 +73,6 @@ const value = computed({
     },
 });
 
-// Check if there's a value
 const hasValue = computed(() => !!props.modelValue);
 
 // Display text for the button
@@ -109,24 +107,30 @@ const clearSelection = () => {
 <template>
     <Popover v-model:open="isOpen">
         <PopoverTrigger as-child>
-            <Button
-                :class="
+            <div class="relative w-full">
+                <Button
+                    type="button"
+                    :class="
                     cn(
                         'w-full justify-start text-left font-normal',
                         !hasValue && 'text-muted-foreground',
                     )
                 "
-                variant="outline"
-                :disabled="disabled"
-            >
-                <CalendarIcon class="mr-2 h-4 w-4" />
-                <span class="flex-1 truncate">{{ displayText }}</span>
-                <X
+                    variant="outline"
+                    :disabled="disabled"
+                >
+                    <CalendarIcon class="mr-2 h-4 w-4" />
+                    <span class="flex-1 truncate">{{ displayText }}</span>
+                </Button>
+                <button
                     v-if="hasValue && !disabled"
-                    class="ml-2 h-4 w-4 shrink-0 opacity-50 hover:opacity-100"
-                    @click="clearSelection"
-                />
-            </Button>
+                    type="button"
+                    class="absolute right-2 top-1/2 -translate-y-1/2 rounded-sm opacity-50 hover:opacity-100 focus:opacity-100 disabled:pointer-events-none"
+                    @click.stop="clearSelection"
+                >
+                    <X class="h-4 w-4" />
+                </button>
+            </div>
         </PopoverTrigger>
         <PopoverContent class="w-auto p-0">
             <CalendarRoot
@@ -225,3 +229,4 @@ const clearSelection = () => {
         </PopoverContent>
     </Popover>
 </template>
+
