@@ -18,7 +18,7 @@ class CreatePostsTable extends Migration
             $table->longText('content');
             $table->enum('status', ['draft', 'scheduled', 'published', 'archived'])->default('draft');
             $table->boolean('is_featured')->default(false);
-            $table->integer('featured_image')->nullable();
+            $table->foreignId('featured_file_id')->nullable()->constrained('files')->onDelete('set null');
             $table->integer('reading_time')->nullable();
             $table->unsignedBigInteger('view_count')->default(0);
             $table->boolean('comments_enabled')->default(true);
