@@ -6,7 +6,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/vue3';
-import { BookOpen, Briefcase, Code, Folder, FolderDot, GraduationCap, LayoutGrid, UserPen } from 'lucide-vue-next';
+import { BookOpen, Briefcase, Code, FileText, Folder, FolderDot, GraduationCap, LayoutGrid, MessageSquare, Tags, UserPen } from 'lucide-vue-next';
 import AppLogo from './AppLogo.vue';
 
 const mainNavItems: NavItem[] = [
@@ -39,6 +39,33 @@ const mainNavItems: NavItem[] = [
         title: 'Certifications',
         href: '/certifications',
         icon: GraduationCap,
+    },
+    {
+        title: 'Blog',
+        icon: FileText,
+        href: '',
+        items: [
+            {
+                title: 'Posts',
+                href: '/posts',
+                icon: FileText,
+            },
+            {
+                title: 'Categories',
+                href: '/categories',
+                icon: Folder,
+            },
+            {
+                title: 'Tags',
+                href: '/tags',
+                icon: Tags,
+            },
+            {
+                title: 'Comments',
+                href: '/comments',
+                icon: MessageSquare,
+            },
+        ],
     },
 ];
 
